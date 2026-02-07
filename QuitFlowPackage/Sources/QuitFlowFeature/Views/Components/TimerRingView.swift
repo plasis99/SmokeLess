@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct TimerRingView: View {
+    @Environment(AppSettings.self) private var settings
     let timeSinceLast: TimeInterval
     let progress: Double
 
@@ -60,12 +61,12 @@ public struct TimerRingView: View {
 
             // Center text
             VStack(spacing: 4) {
-                Text(Date.formattedInterval(timeSinceLast))
+                Text(Date.formattedInterval(timeSinceLast, language: settings.language))
                     .font(.system(size: 38, weight: .light))
                     .tracking(2)
                     .foregroundStyle(Color.theme.textPrimary)
 
-                Text("с последней сигареты")
+                Text(settings.localized(.sinceLastCigarette))
                     .font(.system(size: 10, weight: .medium))
                     .tracking(1)
                     .textCase(.uppercase)
@@ -85,5 +86,6 @@ public struct TimerRingView: View {
     ZStack {
         LinearGradient.backgroundGradient.ignoresSafeArea()
         TimerRingView(timeSinceLast: 10020, progress: 0.65)
+            .environment(AppSettings())
     }
 }

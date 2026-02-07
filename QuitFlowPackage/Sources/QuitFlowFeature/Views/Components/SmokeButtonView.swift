@@ -77,6 +77,7 @@ struct CigaretteShape: View {
 // MARK: - Smoke Button
 
 public struct SmokeButtonView: View {
+    @Environment(AppSettings.self) private var settings
     let onTap: () -> Void
 
     @State private var isPressed = false
@@ -137,7 +138,7 @@ public struct SmokeButtonView: View {
                 .scaleEffect(isPressed ? 0.94 : 1.0)
             }
 
-            Text("Нажми когда закуришь")
+            Text(settings.localized(.tapWhenSmoke))
                 .font(.system(size: 11, weight: .medium))
                 .tracking(0.5)
                 .foregroundStyle(Color.theme.textTertiary)
@@ -149,5 +150,6 @@ public struct SmokeButtonView: View {
     ZStack {
         LinearGradient.backgroundGradient.ignoresSafeArea()
         SmokeButtonView { }
+            .environment(AppSettings())
     }
 }

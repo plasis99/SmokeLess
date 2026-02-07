@@ -1,0 +1,186 @@
+import SwiftUI
+
+struct OnboardingView: View {
+    @Environment(AppSettings.self) private var settings
+    let onFinished: () -> Void
+
+    @State private var currentPage = 0
+    @State private var appeared = false
+
+    private var pages: [(icon: String, titleKey: L10n, descKey: L10n)] {
+        [
+            ("cigarette", .onboardingTitle1, .onboardingDesc1),
+            ("chart.bar.fill", .onboardingTitle2, .onboardingDesc2),
+            ("circle.dotted.circle", .onboardingTitle3, .onboardingDesc3),
+        ]
+    }
+
+    var body: some View {
+        ZStack {
+            LinearGradient.backgroundGradient
+                .ignoresSafeArea()
+
+            // Ambient blobs
+            ZStack {
+                Circle()
+                    .fill(Color.theme.cyan.opacity(0.04))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 60)
+                    .offset(x: -40, y: -120)
+
+                Circle()
+                    .fill(Color.theme.cyan.opacity(0.03))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 50)
+                    .offset(x: 60, y: 200)
+            }
+
+            VStack(spacing: 0) {
+                Spacer()
+
+                // Page content
+                TabView(selection: $currentPage) {
+                    ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
+                        onboardingPage(
+                            iconName: page.icon,
+                            title: settings.localized(page.titleKey),
+                            description: settings.localized(page.descKey),
+                            pageIndex: index
+                        )
+                        .tag(index)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(height: 360)
+                .opacity(appeared ? 1 : 0)
+
+                // Custom dots
+                HStack(spacing: 8) {
+                    ForEach(0..<3, id: \.self) { index in
+                        Capsule()
+                            .fill(index == currentPage ? Color.theme.cyan : Color.white.opacity(0.2))
+                            .frame(width: index == currentPage ? 24 : 8, height: 8)
+                            .animation(.easeInOut(duration: 0.3), value: currentPage)
+                    }
+                }
+                .padding(.top, 20)
+
+                Spacer()
+
+                // Button
+                Button {
+                    if currentPage < 2 {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            currentPage += 1
+                        }
+                    } else {
+                        onFinished()
+                    }
+                } label: {
+                    Text(currentPage < 2 ? settings.localized(.continueButton) : settings.localized(.getStarted))
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color.theme.bgTop)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .background(Color.theme.cyan, in: Capsule())
+                }
+                .padding(.horizontal, 40)
+                .padding(.bottom, 60)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 20)
+            }
+        }
+        .preferredColorScheme(.dark)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.5)) {
+                appeared = true
+            }
+        }
+    }
+
+    private func onboardingPage(iconName: String, title: String, description: String, pageIndex: Int) -> some View {
+        VStack(spacing: 24) {
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(Color.theme.cyan.opacity(0.08))
+                    .frame(width: 100, height: 100)
+
+                onboardingIcon(for: pageIndex)
+            }
+
+            Text(title)
+                .font(.system(size: 24, weight: .bold))
+                .foregroundStyle(Color.theme.textPrimary)
+                .multilineTextAlignment(.center)
+
+            Text(description)
+                .font(.system(size: 15))
+                .foregroundStyle(Color.theme.textSecondary)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .padding(.horizontal, 32)
+        }
+        .padding(.horizontal, 20)
+    }
+
+    @ViewBuilder
+    private func onboardingIcon(for index: Int) -> some View {
+        switch index {
+        case 0:
+            // Cigarette icon
+            CigaretteIcon()
+        case 1:
+            // Chart bars
+            HStack(alignment: .bottom, spacing: 6) {
+                ForEach([0.3, 0.6, 0.45, 0.8, 0.5], id: \.self) { height in
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.theme.cyan)
+                        .frame(width: 8, height: 40 * height)
+                }
+            }
+        default:
+            // Ring / freedom
+            ZStack {
+                Circle()
+                    .stroke(Color.theme.cyan.opacity(0.3), lineWidth: 3)
+                    .frame(width: 50, height: 50)
+
+                Circle()
+                    .trim(from: 0, to: 0.75)
+                    .stroke(Color.theme.cyan, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                    .frame(width: 50, height: 50)
+                    .rotationEffect(.degrees(-90))
+            }
+        }
+    }
+}
+
+// MARK: - Simplified Cigarette Icon for Onboarding
+
+private struct CigaretteIcon: View {
+    var body: some View {
+        HStack(spacing: 0) {
+            // Burning tip
+            RoundedRectangle(cornerRadius: 2)
+                .fill(
+                    LinearGradient(
+                        colors: [.orange, .red.opacity(0.8)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(width: 8, height: 10)
+
+            // White body
+            Rectangle()
+                .fill(Color.white.opacity(0.85))
+                .frame(width: 30, height: 10)
+
+            // Filter
+            RoundedRectangle(cornerRadius: 2)
+                .fill(Color(red: 0.76, green: 0.56, blue: 0.34))
+                .frame(width: 14, height: 10)
+        }
+    }
+}

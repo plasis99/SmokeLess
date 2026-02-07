@@ -3,6 +3,7 @@ import SwiftData
 
 public struct MainView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppSettings.self) private var settings
     @State private var viewModel = MainViewModel()
     @State private var appeared = false
 
@@ -20,7 +21,7 @@ public struct MainView: View {
             // Content
             VStack(spacing: 12) {
                     // Title
-                    Text("SMOKELESS")
+                    Text(settings.localized(.appTitle))
                         .font(.system(size: 15, weight: .semibold))
                         .tracking(2)
                         .foregroundStyle(Color.theme.textTertiary)
@@ -134,5 +135,6 @@ extension View {
 
 #Preview {
     MainView()
+        .environment(AppSettings())
         .modelContainer(for: SmokingEntry.self, inMemory: true)
 }

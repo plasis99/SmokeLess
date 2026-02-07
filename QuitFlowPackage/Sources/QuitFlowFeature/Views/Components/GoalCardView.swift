@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct GoalCardView: View {
+    @Environment(AppSettings.self) private var settings
     let todayCount: Int
     let yesterdayCount: Int
 
@@ -31,12 +32,12 @@ public struct GoalCardView: View {
                 HStack {
                     Text("▼")
                         .foregroundStyle(Color.theme.cyan)
-                    Text("Начни отмечать сигареты")
+                    Text(settings.localized(.startTracking))
                         .foregroundStyle(Color.theme.textPrimary)
                 }
                 .font(.system(size: 14, weight: .medium))
             } else if yesterdayCount == 0 {
-                Text("Вчера ты не курил!")
+                Text(settings.localized(.noCigsYesterday))
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(Color.theme.cyan)
             } else {
@@ -45,7 +46,7 @@ public struct GoalCardView: View {
                     HStack(spacing: 4) {
                         Text("▼")
                             .foregroundStyle(Color.theme.cyan)
-                        Text("Цель: меньше чем вчера")
+                        Text(settings.localized(.goalLessThanYesterday))
                             .foregroundStyle(Color.theme.textSecondary)
                     }
                     .font(.system(size: 12, weight: .medium))
@@ -84,7 +85,7 @@ public struct GoalCardView: View {
                 }
                 .frame(height: 6)
 
-                Text("Вчера: \(yesterdayCount) сигарет")
+                Text(settings.localized(.yesterdayCigs, args: "\(yesterdayCount)"))
                     .font(.system(size: 11))
                     .foregroundStyle(Color.theme.textTertiary)
             }
@@ -104,5 +105,6 @@ public struct GoalCardView: View {
             GoalCardView(todayCount: 5, yesterdayCount: 0)
         }
         .padding()
+        .environment(AppSettings())
     }
 }

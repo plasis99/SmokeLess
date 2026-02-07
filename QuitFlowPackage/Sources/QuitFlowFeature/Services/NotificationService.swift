@@ -5,7 +5,7 @@ public enum NotificationService {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 
-    public static func scheduleSmartReminder(averageInterval: TimeInterval) {
+    public static func scheduleSmartReminder(averageInterval: TimeInterval, language: AppLanguage = .ru) {
         guard averageInterval > 300 else { return } // minimum 5 minutes
 
         let center = UNUserNotificationCenter.current()
@@ -14,7 +14,7 @@ public enum NotificationService {
         let content = UNMutableNotificationContent()
         let minutes = Int(averageInterval * 0.85) / 60
         content.title = "QuitFlow"
-        content.body = "Ты уже \(minutes) минут без сигареты. Может ещё немного?"
+        content.body = Translations.get(.notifBody, language: language, args: "\(minutes)")
         content.sound = .default
 
         let trigger = UNTimeIntervalNotificationTrigger(

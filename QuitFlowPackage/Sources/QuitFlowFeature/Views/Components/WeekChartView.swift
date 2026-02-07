@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct WeekChartView: View {
+    @Environment(AppSettings.self) private var settings
     let weekData: [DailyStats]
     let trendPercent: Int
 
@@ -17,7 +18,7 @@ public struct WeekChartView: View {
         VStack(alignment: .leading, spacing: 10) {
             // Header
             HStack {
-                Text("ЭТА НЕДЕЛЯ")
+                Text(settings.localized(.thisWeek))
                     .font(.system(size: 11, weight: .medium))
                     .tracking(1)
                     .foregroundStyle(Color.theme.textTertiary)
@@ -28,7 +29,7 @@ public struct WeekChartView: View {
                     Text(trendPercent < 0 ? "↓ \(abs(trendPercent))%" : "↑ \(trendPercent)%")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(trendPercent < 0 ? Color.theme.cyan : Color.theme.amber)
-                    Text("к прошлой")
+                    Text(settings.localized(.vsLastWeek))
                         .font(.system(size: 11))
                         .foregroundStyle(Color.theme.textTertiary)
                 }
@@ -57,7 +58,7 @@ public struct WeekChartView: View {
                             .shadow(color: isToday ? Color.theme.cyan.opacity(0.3) : .clear, radius: 6)
 
                         // Day label
-                        Text(stats.date.shortWeekday)
+                        Text(stats.date.shortWeekday(locale: settings.language.locale))
                             .font(.system(size: 10, weight: .medium))
                             .foregroundStyle(isToday ? Color.theme.cyan : Color.theme.textTertiary)
                     }
@@ -86,5 +87,6 @@ public struct WeekChartView: View {
             trendPercent: -23
         )
         .padding()
+        .environment(AppSettings())
     }
 }

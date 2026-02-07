@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct StatsRowView: View {
+    @Environment(AppSettings.self) private var settings
     let todayCount: Int
     let yesterdayCount: Int
     let averageInterval: TimeInterval
@@ -18,20 +19,20 @@ public struct StatsRowView: View {
     public var body: some View {
         HStack(spacing: 12) {
             statCard(
-                title: "СЕГОДНЯ",
+                title: settings.localized(.today),
                 value: "\(todayCount)",
                 valueColor: Color.theme.textPrimary
             )
 
             statCard(
-                title: "К ВЧЕРА",
+                title: settings.localized(.vsYesterday),
                 value: differenceText,
                 valueColor: difference <= 0 ? Color.theme.cyan : Color.theme.amber
             )
 
             statCard(
-                title: "ИНТЕРВАЛ ⌀",
-                value: averageInterval > 0 ? Date.formattedInterval(averageInterval) : "—",
+                title: settings.localized(.avgInterval),
+                value: averageInterval > 0 ? Date.formattedInterval(averageInterval, language: settings.language) : "—",
                 valueColor: Color.theme.textPrimary
             )
         }
@@ -68,5 +69,6 @@ public struct StatsRowView: View {
         LinearGradient.backgroundGradient.ignoresSafeArea()
         StatsRowView(todayCount: 7, yesterdayCount: 10, averageInterval: 4800)
             .padding()
+            .environment(AppSettings())
     }
 }
