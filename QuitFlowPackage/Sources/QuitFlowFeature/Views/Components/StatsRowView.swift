@@ -23,18 +23,21 @@ public struct StatsRowView: View {
                 value: "\(todayCount)",
                 valueColor: Color.theme.textPrimary
             )
+            .accessibilityLabel(settings.localized(.accessTodayCount, args: "\(todayCount)"))
 
             statCard(
                 title: settings.localized(.vsYesterday),
                 value: differenceText,
                 valueColor: difference <= 0 ? Color.theme.cyan : Color.theme.amber
             )
+            .accessibilityLabel(settings.localized(.accessVsYesterday, args: differenceText))
 
             statCard(
                 title: settings.localized(.avgInterval),
                 value: averageInterval > 0 ? Date.formattedInterval(averageInterval, language: settings.language) : "—",
                 valueColor: Color.theme.textPrimary
             )
+            .accessibilityLabel(settings.localized(.accessAvgInterval, args: averageInterval > 0 ? Date.formattedInterval(averageInterval, language: settings.language) : "—"))
         }
     }
 

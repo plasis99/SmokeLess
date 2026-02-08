@@ -40,7 +40,7 @@ public final class MainViewModel {
 
     // MARK: - Actions
 
-    public func logCigarette() {
+    public func logCigarette(language: AppLanguage = .en) {
         guard let modelContext else { return }
         let entry = SmokingEntry(timestamp: .now)
         modelContext.insert(entry)
@@ -52,6 +52,10 @@ public final class MainViewModel {
         #if os(iOS)
         HapticService.impact(.medium)
         #endif
+
+        if averageInterval > 0 {
+            NotificationService.scheduleSmartReminder(averageInterval: averageInterval, language: language)
+        }
     }
 
     // MARK: - Timer

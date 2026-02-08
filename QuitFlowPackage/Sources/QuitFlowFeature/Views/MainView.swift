@@ -4,6 +4,7 @@ import SwiftData
 public struct MainView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppSettings.self) private var settings
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var viewModel = MainViewModel()
     @State private var appeared = false
 
@@ -15,8 +16,10 @@ public struct MainView: View {
             LinearGradient.backgroundGradient
                 .ignoresSafeArea()
 
-            // Ambient blobs
-            ambientBlobs
+            // Ambient blobs (hidden if reduce motion)
+            if !reduceMotion {
+                ambientBlobs
+            }
 
             // Content
             VStack(spacing: 12) {
@@ -60,7 +63,7 @@ public struct MainView: View {
 
                     // Smoke Button
                     SmokeButtonView {
-                        viewModel.logCigarette()
+                        viewModel.logCigarette(language: settings.language)
                     }
                     .fadeInUp(appeared: appeared, delay: 0.5)
 

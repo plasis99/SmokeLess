@@ -63,14 +63,17 @@ public struct SmokeParticleView: View {
             }
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(3))
             particles.removeAll { $0.id == particle.id }
         }
     }
 
     private func burstEmit() {
         for _ in 0..<6 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in: 0...0.3)) {
+            let delay = Double.random(in: 0...0.3)
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(delay))
                 emitParticle()
             }
         }

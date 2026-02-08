@@ -31,6 +31,7 @@ public struct ContentView: View {
             case .onboarding:
                 OnboardingView {
                     settings.hasCompletedOnboarding = true
+                    NotificationService.requestPermission()
                     withAnimation(.easeInOut(duration: 0.4)) {
                         flow = .main
                     }

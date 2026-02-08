@@ -93,6 +93,10 @@ public struct GoalCardView: View {
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .glassCard()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(yesterdayCount > 0
+            ? settings.localized(.accessGoalProgress, args: "\(todayCount)", "\(yesterdayCount)")
+            : settings.localized(.startTracking))
     }
 }
 

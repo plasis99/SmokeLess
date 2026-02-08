@@ -56,7 +56,7 @@ struct SplashScreenView: View {
             }
         }
         .preferredColorScheme(.dark)
-        .onAppear {
+        .task {
             withAnimation(.easeOut(duration: 0.8)) {
                 showTitle = true
             }
@@ -64,9 +64,8 @@ struct SplashScreenView: View {
                 showRing = true
                 ringScale = 1.5
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                onFinished()
-            }
+            try? await Task.sleep(for: .seconds(2))
+            onFinished()
         }
     }
 }

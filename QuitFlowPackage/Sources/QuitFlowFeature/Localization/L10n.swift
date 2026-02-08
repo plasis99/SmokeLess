@@ -44,6 +44,15 @@ public enum L10n: String, CaseIterable, Sendable {
     // Language
     case chooseLanguage
 
+    // Accessibility
+    case accessLogCigarette
+    case accessTimeSince
+    case accessTodayCount
+    case accessVsYesterday
+    case accessAvgInterval
+    case accessGoalProgress
+    case accessWeekTrend
+
     // Common
     case continueButton
     case getStarted

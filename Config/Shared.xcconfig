@@ -28,6 +28,11 @@ INFOPLIST_KEY_UISupportedInterfaceOrientations = portrait
 INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown
 
 // ==========================================
+// Privacy Usage Descriptions
+// ==========================================
+INFOPLIST_KEY_NSUserNotificationsUsageDescription = SmokeLess sends smart reminders to help you track intervals between cigarettes
+
+// ==========================================
 // Entitlements
 // ==========================================
 // AI agents can modify Config/QuitFlow.entitlements to add capabilities

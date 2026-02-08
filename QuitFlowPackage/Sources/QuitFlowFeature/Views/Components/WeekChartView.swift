@@ -69,6 +69,8 @@ public struct WeekChartView: View {
         }
         .padding(14)
         .glassCard()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(settings.localized(.accessWeekTrend, args: trendPercent < 0 ? "↓ \(abs(trendPercent))%" : trendPercent > 0 ? "↑ \(trendPercent)%" : "0%"))
     }
 
     private func barHeight(for count: Int) -> CGFloat {

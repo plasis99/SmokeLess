@@ -102,12 +102,14 @@ public struct SmokeButtonView: View {
                     smokeBurst = true
                     onTap()
 
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .seconds(0.15))
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                             isPressed = false
                         }
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .seconds(0.5))
                         smokeBurst = false
                     }
                 } label: {
@@ -136,6 +138,7 @@ public struct SmokeButtonView: View {
                 }
                 .buttonStyle(.plain)
                 .scaleEffect(isPressed ? 0.94 : 1.0)
+                .accessibilityLabel(settings.localized(.accessLogCigarette))
             }
 
             Text(settings.localized(.tapWhenSmoke))

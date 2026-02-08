@@ -98,6 +98,8 @@ public struct TimerRingView: View {
             }
         }
         .frame(width: 200, height: 200)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(settings.localized(.accessTimeSince, args: Date.formattedInterval(timeSinceLast, language: settings.language)))
         .onAppear {
             withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
                 pulsate = true
