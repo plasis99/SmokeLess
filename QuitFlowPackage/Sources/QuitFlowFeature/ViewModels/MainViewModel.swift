@@ -49,7 +49,9 @@ public final class MainViewModel {
         timeSinceLast = 0
         loadTodayStats()
         loadWeekData()
+        #if os(iOS)
         HapticService.impact(.medium)
+        #endif
     }
 
     // MARK: - Timer

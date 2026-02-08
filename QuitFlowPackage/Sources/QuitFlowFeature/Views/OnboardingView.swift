@@ -50,7 +50,9 @@ struct OnboardingView: View {
                         .tag(index)
                     }
                 }
+                #if os(iOS) || os(watchOS) || os(visionOS)
                 .tabViewStyle(.page(indexDisplayMode: .never))
+                #endif
                 .frame(height: 360)
                 .opacity(appeared ? 1 : 0)
 

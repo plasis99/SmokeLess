@@ -1,3 +1,4 @@
+#if os(iOS)
 import UIKit
 
 public enum HapticService {
@@ -11,3 +12,4 @@ public enum HapticService {
         generator.notificationOccurred(type)
     }
 }
+#endif
