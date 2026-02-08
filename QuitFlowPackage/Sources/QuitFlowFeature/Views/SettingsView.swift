@@ -220,7 +220,7 @@ struct SettingsView: View {
     // MARK: - About
 
     // swiftlint:disable:next force_unwrapping
-    private let privacyPolicyURL = URL(string: "https://plasis99.github.io/smokeless-privacy/")!
+    private let privacyPolicyURL = URL(string: "https://universum.earth/apps/smokeless/privacy")!
 
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: 12) {
