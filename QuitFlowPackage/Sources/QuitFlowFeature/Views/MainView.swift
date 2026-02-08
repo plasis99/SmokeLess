@@ -7,6 +7,9 @@ public struct MainView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var viewModel = MainViewModel()
     @State private var appeared = false
+    @State private var showSettings = false
+    @State private var showAchievements = false
+    @State private var showStats = false
 
     public init() {}
 
@@ -23,12 +26,34 @@ public struct MainView: View {
 
             // Content
             VStack(spacing: 12) {
-                    // Title
-                    Text(settings.localized(.appTitle))
-                        .font(.system(size: 15, weight: .semibold))
-                        .tracking(2)
-                        .foregroundStyle(Color.theme.textTertiary)
-                        .fadeInUp(appeared: appeared, delay: 0)
+                    // Title + Settings
+                    HStack {
+                        Button {
+                            showAchievements = true
+                        } label: {
+                            Image(systemName: "trophy")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundStyle(Color.theme.textTertiary)
+                        }
+                        .buttonStyle(.plain)
+
+                        Spacer()
+                        Text(settings.localized(.appTitle))
+                            .font(.system(size: 15, weight: .semibold))
+                            .tracking(2)
+                            .foregroundStyle(Color.theme.textTertiary)
+                        Spacer()
+
+                        Button {
+                            showSettings = true
+                        } label: {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundStyle(Color.theme.textTertiary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .fadeInUp(appeared: appeared, delay: 0)
 
                     // Timer Ring
                     TimerRingView(
@@ -52,11 +77,20 @@ public struct MainView: View {
                     )
                     .fadeInUp(appeared: appeared, delay: 0.3)
 
-                    // Week Chart
-                    WeekChartView(
-                        weekData: viewModel.weekData,
-                        trendPercent: viewModel.weekTrendPercent
-                    )
+                    // Money Saved
+                    MoneySavedCardView(cigarettesAvoided: viewModel.totalCigarettesAvoided)
+                        .fadeInUp(appeared: appeared, delay: 0.35)
+
+                    // Week Chart (tap for detailed stats)
+                    Button {
+                        showStats = true
+                    } label: {
+                        WeekChartView(
+                            weekData: viewModel.weekData,
+                            trendPercent: viewModel.weekTrendPercent
+                        )
+                    }
+                    .buttonStyle(.plain)
                     .fadeInUp(appeared: appeared, delay: 0.4)
 
                     Spacer(minLength: 0)
@@ -81,6 +115,21 @@ public struct MainView: View {
         }
         .onDisappear {
             viewModel.stopTimer()
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+                .environment(settings)
+        }
+        .sheet(isPresented: $showStats) {
+            StatsDetailView(monthData: viewModel.monthData)
+                .environment(settings)
+        }
+        .sheet(isPresented: $showAchievements) {
+            AchievementsView(
+                currentStreak: viewModel.currentStreak,
+                timeSinceFirstEntry: viewModel.timeSinceFirstEntry
+            )
+            .environment(settings)
         }
     }
 

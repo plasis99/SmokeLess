@@ -44,6 +44,44 @@ public enum L10n: String, CaseIterable, Sendable {
     // Language
     case chooseLanguage
 
+    // Statistics Detail
+    case statistics
+    case last30days
+    case bestDay
+    case worstDay
+    case totalCigs
+    case dailyAvg
+    case trend30d
+
+    // Achievements
+    case achievements
+    case healthTimeline
+    case streakDays
+    case streakDesc
+    case health20min
+    case health8h
+    case health48h
+    case health2w
+    case health3m
+    case health1y
+    case achievementLocked
+
+    // Settings
+    case settings
+    case settingsLanguage
+    case settingsPrice
+    case settingsPackSize
+    case settingsNotifications
+    case settingsCurrency
+    case settingsAbout
+    case settingsVersion
+    case settingsResetData
+    case settingsResetConfirm
+    case settingsResetCancel
+    case settingsResetMessage
+    case settingsMoneySaved
+    case settingsPrivacyPolicy
+
     // Accessibility
     case accessLogCigarette
     case accessTimeSince
