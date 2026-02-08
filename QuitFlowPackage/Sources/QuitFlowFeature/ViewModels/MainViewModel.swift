@@ -30,13 +30,15 @@ public final class MainViewModel {
     private var timer: Timer?
     private var lastEntryDate: Date?
     private var modelContext: ModelContext?
+    private var dailyBaseline: Int = 0
 
     public init() {}
 
     // MARK: - Setup
 
-    public func setup(modelContext: ModelContext) {
+    public func setup(modelContext: ModelContext, dailyBaseline: Int) {
         self.modelContext = modelContext
+        self.dailyBaseline = dailyBaseline
         loadTodayStats()
         loadWeekData()
         loadMoneySavedData()
@@ -47,8 +49,9 @@ public final class MainViewModel {
 
     // MARK: - Actions
 
-    public func logCigarette(language: AppLanguage = .en) {
+    public func logCigarette(language: AppLanguage = .en, dailyBaseline: Int? = nil) {
         guard let modelContext else { return }
+        if let dailyBaseline { self.dailyBaseline = dailyBaseline }
         let entry = SmokingEntry(timestamp: .now)
         modelContext.insert(entry)
         try? modelContext.save()
@@ -251,16 +254,20 @@ public final class MainViewModel {
         }
     }
 
-    /// Calculate total cigarettes avoided based on first day baseline
+    /// Calculate total cigarettes avoided based on user's daily baseline from settings
     public func loadMoneySavedData() {
-        guard let modelContext else { return }
+        guard let modelContext, dailyBaseline > 0 else {
+            totalCigarettesAvoided = 0
+            return
+        }
 
         let descriptor = FetchDescriptor<SmokingEntry>(sortBy: [SortDescriptor(\.timestamp)])
 
         do {
             let allEntries = try modelContext.fetch(descriptor)
-            guard allEntries.count > 1 else {
-                totalCigarettesAvoided = 0
+            guard !allEntries.isEmpty else {
+                // No entries yet — full baseline is saved today
+                totalCigarettesAvoided = dailyBaseline
                 return
             }
 
@@ -270,19 +277,11 @@ public final class MainViewModel {
                 dailyCounts[entry.timestamp.dayString, default: 0] += 1
             }
 
-            let sortedDays = dailyCounts.keys.sorted()
-            guard let firstDayKey = sortedDays.first,
-                  let baseline = dailyCounts[firstDayKey], baseline > 0 else {
-                totalCigarettesAvoided = 0
-                return
-            }
-
-            // Sum avoided: for each subsequent day, baseline - actual (if positive)
+            // For each day with data: avoided = max(0, baseline - actual)
             var avoided = 0
-            for day in sortedDays.dropFirst() {
-                let actual = dailyCounts[day] ?? 0
-                if baseline > actual {
-                    avoided += baseline - actual
+            for (_, count) in dailyCounts {
+                if dailyBaseline > count {
+                    avoided += dailyBaseline - count
                 }
             }
             totalCigarettesAvoided = avoided

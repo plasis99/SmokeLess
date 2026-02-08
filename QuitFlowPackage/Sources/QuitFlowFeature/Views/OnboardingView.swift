@@ -7,6 +7,8 @@ struct OnboardingView: View {
     @State private var currentPage = 0
     @State private var appeared = false
 
+    private let totalPages = 4
+
     private var pages: [(icon: String, titleKey: L10n, descKey: L10n)] {
         [
             ("cigarette", .onboardingTitle1, .onboardingDesc1),
@@ -49,16 +51,20 @@ struct OnboardingView: View {
                         )
                         .tag(index)
                     }
+
+                    // 4th screen — setup fields
+                    setupPage
+                        .tag(3)
                 }
                 #if os(iOS) || os(watchOS) || os(visionOS)
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 #endif
-                .frame(height: 360)
+                .frame(height: 420)
                 .opacity(appeared ? 1 : 0)
 
                 // Custom dots
                 HStack(spacing: 8) {
-                    ForEach(0..<3, id: \.self) { index in
+                    ForEach(0..<totalPages, id: \.self) { index in
                         Capsule()
                             .fill(index == currentPage ? Color.theme.cyan : Color.white.opacity(0.2))
                             .frame(width: index == currentPage ? 24 : 8, height: 8)
@@ -71,7 +77,7 @@ struct OnboardingView: View {
 
                 // Button
                 Button {
-                    if currentPage < 2 {
+                    if currentPage < totalPages - 1 {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             currentPage += 1
                         }
@@ -79,7 +85,7 @@ struct OnboardingView: View {
                         onFinished()
                     }
                 } label: {
-                    Text(currentPage < 2 ? settings.localized(.continueButton) : settings.localized(.getStarted))
+                    Text(currentPage < totalPages - 1 ? settings.localized(.continueButton) : settings.localized(.getStarted))
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color.theme.bgTop)
                         .frame(maxWidth: .infinity)
@@ -99,6 +105,97 @@ struct OnboardingView: View {
             }
         }
     }
+
+    // MARK: - Setup Page (4th screen)
+
+    private var setupPage: some View {
+        VStack(spacing: 20) {
+            // Title
+            Text(settings.localized(.onboardingTitle4))
+                .font(.system(size: 24, weight: .bold))
+                .foregroundStyle(Color.theme.textPrimary)
+                .multilineTextAlignment(.center)
+
+            Text(settings.localized(.onboardingDesc4))
+                .font(.system(size: 15))
+                .foregroundStyle(Color.theme.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+
+            @Bindable var settings = settings
+
+            // Daily baseline
+            VStack(spacing: 0) {
+                setupField(
+                    label: self.settings.localized(.onboardingDailyCount),
+                    value: $settings.dailyBaseline
+                )
+
+                Divider().overlay(Color.theme.glassBorder)
+
+                setupField(
+                    label: self.settings.localized(.onboardingPackSize),
+                    value: $settings.packSize
+                )
+
+                Divider().overlay(Color.theme.glassBorder)
+
+                setupPriceField(
+                    label: self.settings.localized(.onboardingPackPrice),
+                    value: $settings.cigarettePrice
+                )
+            }
+            .glassCard()
+            .padding(.horizontal, 20)
+        }
+        .padding(.horizontal, 20)
+    }
+
+    private func setupField(label: String, value: Binding<Int>) -> some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(Color.theme.textSecondary)
+
+            Spacer()
+
+            TextField("20", value: value, format: .number)
+                .keyboardType(.numberPad)
+                .multilineTextAlignment(.trailing)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(Color.theme.cyan)
+                .frame(width: 80)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 14)
+    }
+
+    private func setupPriceField(label: String, value: Binding<Double>) -> some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(Color.theme.textSecondary)
+
+            Spacer()
+
+            HStack(spacing: 4) {
+                TextField("0", value: value, format: .number)
+                    .keyboardType(.decimalPad)
+                    .multilineTextAlignment(.trailing)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(Color.theme.cyan)
+                    .frame(width: 70)
+
+                Text(settings.localized(.settingsCurrency))
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(Color.theme.textTertiary)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 14)
+    }
+
+    // MARK: - Info Pages
 
     private func onboardingPage(iconName: String, title: String, description: String, pageIndex: Int) -> some View {
         VStack(spacing: 24) {

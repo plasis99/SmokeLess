@@ -91,6 +91,14 @@ public enum L10n: String, CaseIterable, Sendable {
     case accessGoalProgress
     case accessWeekTrend
 
+    // Onboarding - Setup screen
+    case onboardingTitle4
+    case onboardingDesc4
+    case onboardingDailyCount
+    case onboardingPackSize
+    case onboardingPackPrice
+    case settingsDailyBaseline
+
     // Common
     case continueButton
     case getStarted

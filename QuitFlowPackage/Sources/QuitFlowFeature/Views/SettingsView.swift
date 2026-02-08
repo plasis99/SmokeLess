@@ -5,7 +5,6 @@ struct SettingsView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-
     @State private var showResetAlert = false
 
     var body: some View {
@@ -125,7 +124,24 @@ struct SettingsView: View {
             @Bindable var settings = settings
 
             HStack {
-                Text(settings.localized(.settingsPrice))
+                Text(self.settings.localized(.settingsDailyBaseline))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color.theme.textSecondary)
+
+                Spacer()
+
+                TextField("20", value: $settings.dailyBaseline, format: .number)
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color.theme.textPrimary)
+                    .frame(width: 70)
+            }
+
+            Divider().overlay(Color.theme.glassBorder)
+
+            HStack {
+                Text(self.settings.localized(.settingsPrice))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.theme.textSecondary)
 
@@ -139,7 +155,7 @@ struct SettingsView: View {
                         .foregroundStyle(Color.theme.textPrimary)
                         .frame(width: 70)
 
-                    Text(settings.localized(.settingsCurrency))
+                    Text(self.settings.localized(.settingsCurrency))
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(Color.theme.textTertiary)
                 }
@@ -148,7 +164,7 @@ struct SettingsView: View {
             Divider().overlay(Color.theme.glassBorder)
 
             HStack {
-                Text(settings.localized(.settingsPackSize))
+                Text(self.settings.localized(.settingsPackSize))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.theme.textSecondary)
 

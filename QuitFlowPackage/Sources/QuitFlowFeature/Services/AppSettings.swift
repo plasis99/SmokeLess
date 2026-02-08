@@ -25,6 +25,10 @@ public final class AppSettings {
         didSet { defaults.set(notificationsEnabled, forKey: "notificationsEnabled") }
     }
 
+    public var dailyBaseline: Int {
+        didSet { defaults.set(dailyBaseline, forKey: "dailyBaseline") }
+    }
+
     public var pricePerCigarette: Double {
         guard packSize > 0 else { return 0 }
         return cigarettePrice / Double(packSize)
@@ -38,6 +42,8 @@ public final class AppSettings {
         let savedPack = defaults.integer(forKey: "packSize")
         self.packSize = savedPack > 0 ? savedPack : 20
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") == nil ? true : defaults.bool(forKey: "notificationsEnabled")
+        let savedBaseline = defaults.integer(forKey: "dailyBaseline")
+        self.dailyBaseline = savedBaseline > 0 ? savedBaseline : 20
     }
 
     public func localized(_ key: L10n) -> String {

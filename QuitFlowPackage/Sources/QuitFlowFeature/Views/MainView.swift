@@ -97,7 +97,7 @@ public struct MainView: View {
 
                     // Smoke Button
                     SmokeButtonView {
-                        viewModel.logCigarette(language: settings.language)
+                        viewModel.logCigarette(language: settings.language, dailyBaseline: settings.dailyBaseline)
                     }
                     .fadeInUp(appeared: appeared, delay: 0.5)
 
@@ -108,7 +108,7 @@ public struct MainView: View {
         .preferredColorScheme(.dark)
         .persistentSystemOverlays(.hidden)
         .task {
-            viewModel.setup(modelContext: modelContext)
+            viewModel.setup(modelContext: modelContext, dailyBaseline: settings.dailyBaseline)
             withAnimation(.easeOut(duration: 0.5)) {
                 appeared = true
             }
