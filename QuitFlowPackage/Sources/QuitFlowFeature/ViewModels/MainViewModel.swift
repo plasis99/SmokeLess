@@ -26,6 +26,11 @@ public final class MainViewModel {
         return min(timeSinceLast / averageInterval, 1.0)
     }
 
+    // MARK: - Undo
+    public var lastLoggedEntry: SmokingEntry?
+    public var showUndoToast = false
+    private var undoTask: Task<Void, Never>?
+
     // MARK: - Private
     private var timer: Timer?
     private var lastEntryDate: Date?
@@ -49,7 +54,7 @@ public final class MainViewModel {
 
     // MARK: - Actions
 
-    public func logCigarette(language: AppLanguage = .en, dailyBaseline: Int? = nil) {
+    public func logCigarette(language: AppLanguage = .en, dailyBaseline: Int? = nil, notificationsEnabled: Bool = true) {
         guard let modelContext else { return }
         if let dailyBaseline { self.dailyBaseline = dailyBaseline }
         let entry = SmokingEntry(timestamp: .now)
@@ -65,9 +70,45 @@ public final class MainViewModel {
         HapticService.impact(.medium)
         #endif
 
-        if averageInterval > 0 {
+        if notificationsEnabled && averageInterval > 0 {
             NotificationService.scheduleSmartReminder(averageInterval: averageInterval, language: language)
         }
+
+        // Undo support
+        lastLoggedEntry = entry
+        withAnimation(.easeInOut(duration: 0.3)) {
+            showUndoToast = true
+        }
+        undoTask?.cancel()
+        undoTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(5))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeInOut(duration: 0.3)) {
+                self?.showUndoToast = false
+            }
+            // Clear undo availability after 30 seconds
+            try? await Task.sleep(for: .seconds(25))
+            guard !Task.isCancelled else { return }
+            self?.lastLoggedEntry = nil
+        }
+    }
+
+    public func undoLastCigarette() {
+        guard let modelContext, let entry = lastLoggedEntry else { return }
+        undoTask?.cancel()
+        modelContext.delete(entry)
+        try? modelContext.save()
+        lastLoggedEntry = nil
+        withAnimation(.easeInOut(duration: 0.3)) {
+            showUndoToast = false
+        }
+        loadTodayStats()
+        loadWeekData()
+        loadMoneySavedData()
+        loadStreakData()
+        #if os(iOS)
+        HapticService.impact(.light)
+        #endif
     }
 
     // MARK: - Timer
@@ -210,7 +251,9 @@ public final class MainViewModel {
         }
     }
 
-    /// Calculate streak: consecutive days where count < previous day
+    /// Calculate streak: consecutive days (from today backward) where each day
+    /// has fewer or equal cigarettes compared to the previous (older) day.
+    /// This means the user is reducing their smoking over the streak period.
     public func loadStreakData() {
         guard let modelContext else { return }
 
@@ -232,21 +275,20 @@ public final class MainViewModel {
                 dailyCounts[entry.timestamp.dayString, default: 0] += 1
             }
 
-            let sortedDays = dailyCounts.keys.sorted().reversed()
+            // Sort days newest first (today, yesterday, day before, ...)
+            let sortedDays = dailyCounts.keys.sorted().reversed().map { $0 }
             var streak = 0
-            var previousCount: Int?
 
-            for day in sortedDays {
-                let count = dailyCounts[day] ?? 0
-                if let prev = previousCount {
-                    if count >= prev {
-                        // This day had same or more cigarettes → streak continues backward
-                        streak += 1
-                    } else {
-                        break
-                    }
+            // Compare pairs: today vs yesterday, yesterday vs day_before, etc.
+            // Streak increments if the newer day <= the older day (reducing trend)
+            for i in 0..<(sortedDays.count - 1) {
+                let newerDayCount = dailyCounts[sortedDays[i]] ?? 0
+                let olderDayCount = dailyCounts[sortedDays[i + 1]] ?? 0
+                if newerDayCount <= olderDayCount {
+                    streak += 1
+                } else {
+                    break
                 }
-                previousCount = count
             }
             currentStreak = streak
         } catch {

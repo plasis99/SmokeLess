@@ -14,11 +14,17 @@ public final class AppSettings {
     }
 
     public var cigarettePrice: Double {
-        didSet { defaults.set(cigarettePrice, forKey: "cigarettePrice") }
+        didSet {
+            if cigarettePrice < 0 { cigarettePrice = 0 }
+            defaults.set(cigarettePrice, forKey: "cigarettePrice")
+        }
     }
 
     public var packSize: Int {
-        didSet { defaults.set(packSize, forKey: "packSize") }
+        didSet {
+            if packSize < 1 { packSize = 1 }
+            defaults.set(packSize, forKey: "packSize")
+        }
     }
 
     public var notificationsEnabled: Bool {
@@ -26,7 +32,10 @@ public final class AppSettings {
     }
 
     public var dailyBaseline: Int {
-        didSet { defaults.set(dailyBaseline, forKey: "dailyBaseline") }
+        didSet {
+            if dailyBaseline < 1 { dailyBaseline = 1 }
+            defaults.set(dailyBaseline, forKey: "dailyBaseline")
+        }
     }
 
     public var pricePerCigarette: Double {

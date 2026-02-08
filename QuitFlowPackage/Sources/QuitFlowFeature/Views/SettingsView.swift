@@ -181,6 +181,15 @@ struct SettingsView: View {
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .glassCard()
+        .onChange(of: settings.dailyBaseline) { _, newValue in
+            if newValue < 1 { settings.dailyBaseline = 1 }
+        }
+        .onChange(of: settings.packSize) { _, newValue in
+            if newValue < 1 { settings.packSize = 1 }
+        }
+        .onChange(of: settings.cigarettePrice) { _, newValue in
+            if newValue < 0 { settings.cigarettePrice = 0 }
+        }
     }
 
     // MARK: - Notifications
@@ -210,6 +219,9 @@ struct SettingsView: View {
 
     // MARK: - About
 
+    // swiftlint:disable:next force_unwrapping
+    private let privacyPolicyURL = URL(string: "https://plasis99.github.io/smokeless-privacy/")!
+
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle(settings.localized(.settingsAbout))
@@ -222,6 +234,20 @@ struct SettingsView: View {
                 Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color.theme.textTertiary)
+            }
+
+            Divider().overlay(Color.theme.glassBorder)
+
+            Link(destination: privacyPolicyURL) {
+                HStack {
+                    Text(settings.localized(.settingsPrivacyPolicy))
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Color.theme.textSecondary)
+                    Spacer()
+                    Image(systemName: "arrow.up.right")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.theme.textTertiary)
+                }
             }
         }
         .padding(14)

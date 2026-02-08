@@ -53,14 +53,14 @@ public struct MainView: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    .fadeInUp(appeared: appeared, delay: 0)
+                    .fadeInUp(appeared: appeared, delay: 0.2)
 
                     // Timer Ring
                     TimerRingView(
                         timeSinceLast: viewModel.timeSinceLast,
                         progress: viewModel.timerProgress
                     )
-                    .fadeInUp(appeared: appeared, delay: 0.1)
+                    .fadeInUp(appeared: appeared, delay: 0.4)
 
                     // Stats Row
                     StatsRowView(
@@ -68,18 +68,18 @@ public struct MainView: View {
                         yesterdayCount: viewModel.yesterdayCount,
                         averageInterval: viewModel.averageInterval
                     )
-                    .fadeInUp(appeared: appeared, delay: 0.2)
+                    .fadeInUp(appeared: appeared, delay: 0.55)
 
                     // Goal Card
                     GoalCardView(
                         todayCount: viewModel.todayCount,
                         yesterdayCount: viewModel.yesterdayCount
                     )
-                    .fadeInUp(appeared: appeared, delay: 0.3)
+                    .fadeInUp(appeared: appeared, delay: 0.7)
 
                     // Money Saved
                     MoneySavedCardView(cigarettesAvoided: viewModel.totalCigarettesAvoided)
-                        .fadeInUp(appeared: appeared, delay: 0.35)
+                        .fadeInUp(appeared: appeared, delay: 0.8)
 
                     // Week Chart (tap for detailed stats)
                     Button {
@@ -91,25 +91,67 @@ public struct MainView: View {
                         )
                     }
                     .buttonStyle(.plain)
-                    .fadeInUp(appeared: appeared, delay: 0.4)
+                    .fadeInUp(appeared: appeared, delay: 0.9)
 
                     Spacer(minLength: 0)
 
                     // Smoke Button
                     SmokeButtonView {
-                        viewModel.logCigarette(language: settings.language, dailyBaseline: settings.dailyBaseline)
+                        viewModel.logCigarette(
+                            language: settings.language,
+                            dailyBaseline: settings.dailyBaseline,
+                            notificationsEnabled: settings.notificationsEnabled
+                        )
                     }
-                    .fadeInUp(appeared: appeared, delay: 0.5)
+                    .fadeInUp(appeared: appeared, delay: 1.05)
 
                     Spacer(minLength: 0)
                 }
                 .padding(.horizontal, 20)
+
+            // Undo toast
+            if viewModel.showUndoToast {
+                VStack {
+                    Spacer()
+                    HStack(spacing: 12) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(Color.theme.cyan)
+                            .font(.system(size: 16))
+                        Text(settings.localized(.cigaretteLogged))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(Color.theme.textPrimary)
+                        Spacer()
+                        Button {
+                            viewModel.undoLastCigarette()
+                        } label: {
+                            Text(settings.localized(.undo))
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(Color.theme.cyan)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background {
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(.ultraThinMaterial)
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 14)
+                                    .stroke(Color.theme.glassBorder, lineWidth: 1)
+                            }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+                .allowsHitTesting(true)
+            }
         }
         .preferredColorScheme(.dark)
         .persistentSystemOverlays(.hidden)
         .task {
             viewModel.setup(modelContext: modelContext, dailyBaseline: settings.dailyBaseline)
-            withAnimation(.easeOut(duration: 0.5)) {
+            withAnimation(.easeOut(duration: 0.8)) {
                 appeared = true
             }
         }
@@ -175,7 +217,7 @@ struct FadeInUpModifier: ViewModifier {
         content
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 20)
-            .animation(.easeOut(duration: 0.5).delay(delay), value: appeared)
+            .animation(.easeOut(duration: 0.8).delay(delay), value: appeared)
     }
 }
 

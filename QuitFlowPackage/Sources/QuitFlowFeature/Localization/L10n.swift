@@ -99,6 +99,10 @@ public enum L10n: String, CaseIterable, Sendable {
     case onboardingPackPrice
     case settingsDailyBaseline
 
+    // Undo
+    case cigaretteLogged
+    case undo
+
     // Common
     case continueButton
     case getStarted

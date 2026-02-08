@@ -6,6 +6,7 @@ struct OnboardingView: View {
 
     @State private var currentPage = 0
     @State private var appeared = false
+    @State private var isFinishing = false
 
     private let totalPages = 4
 
@@ -82,7 +83,13 @@ struct OnboardingView: View {
                             currentPage += 1
                         }
                     } else {
-                        onFinished()
+                        withAnimation(.easeOut(duration: 0.6)) {
+                            isFinishing = true
+                        }
+                        Task {
+                            try? await Task.sleep(for: .milliseconds(700))
+                            onFinished()
+                        }
                     }
                 } label: {
                     Text(currentPage < totalPages - 1 ? settings.localized(.continueButton) : settings.localized(.getStarted))
@@ -98,6 +105,7 @@ struct OnboardingView: View {
                 .offset(y: appeared ? 0 : 20)
             }
         }
+        .opacity(isFinishing ? 0 : 1)
         .preferredColorScheme(.dark)
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) {
@@ -147,6 +155,15 @@ struct OnboardingView: View {
             }
             .glassCard()
             .padding(.horizontal, 20)
+            .onChange(of: settings.dailyBaseline) { _, newValue in
+                if newValue < 1 { settings.dailyBaseline = 1 }
+            }
+            .onChange(of: settings.packSize) { _, newValue in
+                if newValue < 1 { settings.packSize = 1 }
+            }
+            .onChange(of: settings.cigarettePrice) { _, newValue in
+                if newValue < 0 { settings.cigarettePrice = 0 }
+            }
         }
         .padding(.horizontal, 20)
     }

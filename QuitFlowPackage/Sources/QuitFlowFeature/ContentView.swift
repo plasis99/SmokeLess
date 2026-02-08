@@ -32,7 +32,7 @@ public struct ContentView: View {
                 OnboardingView {
                     settings.hasCompletedOnboarding = true
                     NotificationService.requestPermission()
-                    withAnimation(.easeInOut(duration: 0.4)) {
+                    withAnimation(.easeInOut(duration: 1.0)) {
                         flow = .main
                     }
                 }
@@ -40,7 +40,7 @@ public struct ContentView: View {
 
             case .main:
                 MainView()
-                    .transition(.opacity)
+                    .transition(.opacity.combined(with: .scale(scale: 0.97)))
             }
         }
         .environment(settings)

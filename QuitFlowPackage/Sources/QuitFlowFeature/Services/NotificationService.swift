@@ -13,7 +13,7 @@ public enum NotificationService {
 
         let content = UNMutableNotificationContent()
         let minutes = Int(averageInterval * 0.85) / 60
-        content.title = "QuitFlow"
+        content.title = "SmokeLess"
         content.body = Translations.get(.notifBody, language: language, args: "\(minutes)")
         content.sound = .default
 
