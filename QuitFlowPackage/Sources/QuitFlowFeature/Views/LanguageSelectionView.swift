@@ -34,12 +34,12 @@ struct LanguageSelectionView: View {
                     .foregroundStyle(Color.theme.textPrimary)
                     .opacity(appeared ? 1 : 0)
 
-                HStack(spacing: 16) {
+                HStack(spacing: 12) {
                     ForEach(AppLanguage.allCases, id: \.rawValue) { lang in
                         languageCard(lang)
                     }
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 16)
                 .opacity(appeared ? 1 : 0)
                 .offset(y: appeared ? 0 : 20)
 
@@ -76,16 +76,18 @@ struct LanguageSelectionView: View {
             @Bindable var settings = settings
             settings.language = lang
         } label: {
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
                 Text(lang.flag)
-                    .font(.system(size: 40))
+                    .font(.system(size: 36))
 
                 Text(lang.displayName)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(Color.theme.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 24)
+            .padding(.vertical, 20)
             .glassCard()
             .overlay {
                 RoundedRectangle(cornerRadius: 20)

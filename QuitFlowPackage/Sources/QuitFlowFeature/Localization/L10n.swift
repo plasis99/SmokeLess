@@ -31,6 +31,7 @@ public enum L10n: String, CaseIterable, Sendable {
     // Time
     case hoursShort
     case minutesShort
+    case secondsShort
 
     // Onboarding
     case onboardingTitle1

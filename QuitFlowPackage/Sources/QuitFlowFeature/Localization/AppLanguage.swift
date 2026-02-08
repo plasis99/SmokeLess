@@ -3,11 +3,13 @@ import Foundation
 public enum AppLanguage: String, CaseIterable, Sendable {
     case ru
     case en
+    case uk
 
     public var displayName: String {
         switch self {
         case .ru: "Русский"
         case .en: "English"
+        case .uk: "Українська"
         }
     }
 
@@ -15,6 +17,7 @@ public enum AppLanguage: String, CaseIterable, Sendable {
         switch self {
         case .ru: "🇷🇺"
         case .en: "🇬🇧"
+        case .uk: "🇺🇦"
         }
     }
 

@@ -29,16 +29,21 @@ extension Date {
 
     static func formattedInterval(_ interval: TimeInterval, language: AppLanguage = .ru) -> String {
         guard interval.isFinite, interval >= 0 else {
-            return "0" + Translations.get(.minutesShort, language: language)
+            return "0" + Translations.get(.secondsShort, language: language)
         }
-        let totalMinutes = Int(interval) / 60
-        let hours = totalMinutes / 60
-        let minutes = totalMinutes % 60
+        let totalSeconds = Int(interval)
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
         let h = Translations.get(.hoursShort, language: language)
         let m = Translations.get(.minutesShort, language: language)
+        let s = Translations.get(.secondsShort, language: language)
         if hours > 0 {
-            return "\(hours)\(h) \(minutes)\(m)"
+            return "\(hours)\(h) \(minutes)\(m) \(seconds)\(s)"
         }
-        return "\(minutes)\(m)"
+        if minutes > 0 {
+            return "\(minutes)\(m) \(seconds)\(s)"
+        }
+        return "\(seconds)\(s)"
     }
 }
