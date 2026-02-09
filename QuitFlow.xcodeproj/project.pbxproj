@@ -61,6 +61,13 @@
 			);
 			target = 8B41F6442DEDD0D5001A66F9 /* QuitFlow */;
 		};
+		AA0011002DF0000000000001 /* Exceptions for "QuitFlowWidget" folder in "QuitFlowWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AA0006002DF0000000000001 /* QuitFlowWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -84,6 +91,9 @@
 		};
 		AA0002002DF0000000000001 /* QuitFlowWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AA0011002DF0000000000001 /* Exceptions for "QuitFlowWidget" folder in "QuitFlowWidgetExtension" target */,
+			);
 			path = QuitFlowWidget;
 			sourceTree = "<group>";
 		};
@@ -529,11 +539,11 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = QuitFlowWidget/QuitFlowWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = S27D4DAHJT;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = QuitFlowWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SmokeLess;
-				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = "com.apple.widgetkit-extension";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -557,11 +567,11 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = QuitFlowWidget/QuitFlowWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = S27D4DAHJT;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = QuitFlowWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SmokeLess;
-				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = "com.apple.widgetkit-extension";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
