@@ -3,7 +3,7 @@ import Foundation
 @MainActor
 @Observable
 public final class AppSettings {
-    private let defaults = UserDefaults.standard
+    private let defaults = UserDefaults(suiteName: "group.com.perelygin.quitflow") ?? .standard
 
     public var hasCompletedOnboarding: Bool {
         didSet { defaults.set(hasCompletedOnboarding, forKey: "hasCompletedOnboarding") }
