@@ -37,3 +37,4 @@ INFOPLIST_KEY_NSUserNotificationsUsageDescription = SmokeLess sends smart remind
 // ==========================================
 // AI agents can modify Config/QuitFlow.entitlements to add capabilities
 CODE_SIGN_ENTITLEMENTS = Config/QuitFlow.entitlements
+DEVELOPMENT_TEAM = S27D4DAHJT
