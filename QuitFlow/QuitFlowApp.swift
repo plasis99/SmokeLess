@@ -17,6 +17,9 @@ struct QuitFlowApp: App {
         } else {
             modelContainer = try! ModelContainer(for: SmokingEntry.self)
         }
+
+        // Activate Watch connectivity for iPhone ↔ Watch sync
+        WatchConnectivityService.shared.activate()
     }
 
     var body: some Scene {

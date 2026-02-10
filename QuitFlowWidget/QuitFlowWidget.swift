@@ -1,6 +1,8 @@
+import ActivityKit
 import WidgetKit
 import SwiftUI
 import SwiftData
+import AppIntents
 import QuitFlowFeature
 
 // MARK: - App Group
@@ -110,7 +112,7 @@ struct SmokeLessWidgetView: View {
     // MARK: - Small Widget
 
     private var smallWidget: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             HStack {
                 Text("SMOKELESS")
                     .font(.system(size: 9, weight: .semibold))
@@ -122,25 +124,33 @@ struct SmokeLessWidgetView: View {
             Spacer()
 
             Text(entry.timeSinceLast)
-                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(teal)
                 .minimumScaleFactor(0.6)
 
             Text("since last")
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(.white.opacity(0.5))
 
             Spacer()
 
             HStack {
-                Text("TODAY")
-                    .font(.system(size: 9, weight: .medium))
-                    .tracking(1)
-                    .foregroundStyle(.white.opacity(0.4))
+                HStack(spacing: 4) {
+                    Text("TODAY")
+                        .font(.system(size: 9, weight: .medium))
+                        .tracking(1)
+                        .foregroundStyle(.white.opacity(0.4))
+                    Text("\(entry.todayCount)")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                }
                 Spacer()
-                Text("\(entry.todayCount)")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                Button(intent: LogCigaretteIntent()) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 26))
+                        .foregroundStyle(teal)
+                }
+                .buttonStyle(.plain)
             }
         }
         .padding(14)
@@ -169,8 +179,8 @@ struct SmokeLessWidgetView: View {
                 .fill(teal.opacity(0.3))
                 .frame(width: 2, height: 50)
 
-            // Right: Today count
-            VStack(spacing: 6) {
+            // Right: Today count + button
+            VStack(spacing: 8) {
                 Text("\(entry.todayCount)")
                     .font(.system(size: 36, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
@@ -178,6 +188,21 @@ struct SmokeLessWidgetView: View {
                 Text("today")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.white.opacity(0.5))
+
+                Button(intent: LogCigaretteIntent()) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 12, weight: .bold))
+                        Text("LOG")
+                            .font(.system(size: 11, weight: .bold))
+                            .tracking(0.5)
+                    }
+                    .foregroundStyle(bgDark)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
+                    .background(teal, in: Capsule())
+                }
+                .buttonStyle(.plain)
             }
             .frame(maxWidth: .infinity)
         }
@@ -207,6 +232,7 @@ struct SmokeLessWidget: Widget {
 struct SmokeLessWidgetBundle: WidgetBundle {
     var body: some Widget {
         SmokeLessWidget()
+        CigaretteLiveActivity()
     }
 }
 

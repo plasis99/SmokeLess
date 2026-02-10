@@ -1,3 +1,6 @@
+#if os(iOS)
+import ActivityKit
+#endif
 import Foundation
 import SwiftData
 import SwiftUI
@@ -50,6 +53,13 @@ public final class MainViewModel {
         loadStreakData()
         loadMonthData()
         startTimer()
+
+        // Start Live Activity if there's data today
+        #if os(iOS)
+        if todayCount > 0 {
+            LiveActivityManager.shared.startOrUpdate(todayCount: todayCount, lastCigaretteDate: lastEntryDate)
+        }
+        #endif
     }
 
     // MARK: - Actions
@@ -74,6 +84,14 @@ public final class MainViewModel {
             NotificationService.scheduleSmartReminder(averageInterval: averageInterval, language: language)
         }
 
+        // Update Live Activity
+        #if os(iOS)
+        LiveActivityManager.shared.startOrUpdate(todayCount: todayCount, lastCigaretteDate: entry.timestamp)
+        #endif
+
+        // Sync to Watch / iPhone
+        WatchConnectivityService.shared.sendNewEntry(SmokingEntryTransfer(from: entry))
+
         // Undo support
         lastLoggedEntry = entry
         withAnimation(.easeInOut(duration: 0.3)) {
@@ -95,10 +113,14 @@ public final class MainViewModel {
 
     public func undoLastCigarette() {
         guard let modelContext, let entry = lastLoggedEntry else { return }
+        let entryId = entry.id
         undoTask?.cancel()
         modelContext.delete(entry)
         try? modelContext.save()
         lastLoggedEntry = nil
+
+        // Sync delete to Watch / iPhone
+        WatchConnectivityService.shared.sendDeleteEntry(entryId)
         withAnimation(.easeInOut(duration: 0.3)) {
             showUndoToast = false
         }
@@ -108,6 +130,15 @@ public final class MainViewModel {
         loadStreakData()
         #if os(iOS)
         HapticService.impact(.light)
+        #endif
+
+        // Update Live Activity
+        #if os(iOS)
+        if todayCount > 0 {
+            LiveActivityManager.shared.startOrUpdate(todayCount: todayCount, lastCigaretteDate: lastEntryDate)
+        } else {
+            LiveActivityManager.shared.endActivity()
+        }
         #endif
     }
 

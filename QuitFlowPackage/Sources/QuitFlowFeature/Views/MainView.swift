@@ -1,3 +1,6 @@
+#if os(iOS)
+import StoreKit
+#endif
 import SwiftUI
 import SwiftData
 
@@ -5,6 +8,9 @@ public struct MainView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppSettings.self) private var settings
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    #if os(iOS)
+    @Environment(\.requestReview) private var requestReview
+    #endif
     @State private var viewModel = MainViewModel()
     @State private var appeared = false
     @State private var showSettings = false
@@ -102,6 +108,13 @@ public struct MainView: View {
                             dailyBaseline: settings.dailyBaseline,
                             notificationsEnabled: settings.notificationsEnabled
                         )
+                        settings.incrementCigaretteCount()
+                        #if os(iOS)
+                        if settings.shouldRequestReview {
+                            settings.lastReviewPromptDate = .now
+                            requestReview()
+                        }
+                        #endif
                     }
                     .fadeInUp(appeared: appeared, delay: 1.05)
 
@@ -148,9 +161,12 @@ public struct MainView: View {
             }
         }
         .preferredColorScheme(.dark)
+        #if os(iOS)
         .persistentSystemOverlays(.hidden)
+        #endif
         .task {
             viewModel.setup(modelContext: modelContext, dailyBaseline: settings.dailyBaseline)
+            setupWatchSync()
             withAnimation(.easeOut(duration: 0.8)) {
                 appeared = true
             }
@@ -172,6 +188,41 @@ public struct MainView: View {
                 timeSinceFirstEntry: viewModel.timeSinceFirstEntry
             )
             .environment(settings)
+        }
+    }
+
+    // MARK: - Watch Sync
+
+    private func setupWatchSync() {
+        WatchConnectivityService.shared.onEntriesReceived = { transfers in
+            for transfer in transfers {
+                let existingId = transfer.id
+                let predicate = #Predicate<SmokingEntry> { entry in
+                    entry.id == existingId
+                }
+                let descriptor = FetchDescriptor(predicate: predicate)
+                let exists = (try? modelContext.fetch(descriptor))?.first != nil
+                if !exists {
+                    let entry = SmokingEntry(timestamp: transfer.timestamp)
+                    entry.id = transfer.id
+                    modelContext.insert(entry)
+                }
+            }
+            try? modelContext.save()
+            viewModel.loadTodayStats()
+            viewModel.loadWeekData()
+        }
+        WatchConnectivityService.shared.onEntryDeleted = { id in
+            let predicate = #Predicate<SmokingEntry> { entry in
+                entry.id == id
+            }
+            let descriptor = FetchDescriptor(predicate: predicate)
+            if let entry = try? modelContext.fetch(descriptor).first {
+                modelContext.delete(entry)
+                try? modelContext.save()
+                viewModel.loadTodayStats()
+                viewModel.loadWeekData()
+            }
         }
     }
 

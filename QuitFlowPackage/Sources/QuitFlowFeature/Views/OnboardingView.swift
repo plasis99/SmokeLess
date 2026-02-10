@@ -177,7 +177,9 @@ struct OnboardingView: View {
             Spacer()
 
             TextField("20", value: value, format: .number)
+                #if os(iOS)
                 .keyboardType(.numberPad)
+                #endif
                 .multilineTextAlignment(.trailing)
                 .font(.system(size: 20, weight: .bold))
                 .foregroundStyle(Color.theme.cyan)
@@ -197,7 +199,9 @@ struct OnboardingView: View {
 
             HStack(spacing: 4) {
                 TextField("0", value: value, format: .number)
+                    #if os(iOS)
                     .keyboardType(.decimalPad)
+                    #endif
                     .multilineTextAlignment(.trailing)
                     .font(.system(size: 20, weight: .bold))
                     .foregroundStyle(Color.theme.cyan)

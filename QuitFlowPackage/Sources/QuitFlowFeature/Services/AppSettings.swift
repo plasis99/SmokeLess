@@ -38,6 +38,44 @@ public final class AppSettings {
         }
     }
 
+    // MARK: - Review Prompt Tracking
+
+    public var firstLaunchDate: Date? {
+        didSet {
+            if let date = firstLaunchDate {
+                defaults.set(date.timeIntervalSince1970, forKey: "firstLaunchDate")
+            }
+        }
+    }
+
+    public var totalCigarettesLogged: Int {
+        didSet { defaults.set(totalCigarettesLogged, forKey: "totalCigarettesLogged") }
+    }
+
+    public var lastReviewPromptDate: Date? {
+        didSet {
+            if let date = lastReviewPromptDate {
+                defaults.set(date.timeIntervalSince1970, forKey: "lastReviewPromptDate")
+            }
+        }
+    }
+
+    public func incrementCigaretteCount() {
+        totalCigarettesLogged += 1
+    }
+
+    public var shouldRequestReview: Bool {
+        guard let firstLaunch = firstLaunchDate else { return false }
+        let daysSinceFirstLaunch = Calendar.current.dateComponents([.day], from: firstLaunch, to: .now).day ?? 0
+        guard daysSinceFirstLaunch >= 3 else { return false }
+        guard totalCigarettesLogged >= 10 else { return false }
+        if let lastPrompt = lastReviewPromptDate {
+            let daysSincePrompt = Calendar.current.dateComponents([.day], from: lastPrompt, to: .now).day ?? 0
+            guard daysSincePrompt >= 90 else { return false }
+        }
+        return true
+    }
+
     public var pricePerCigarette: Double {
         guard packSize > 0 else { return 0 }
         return cigarettePrice / Double(packSize)
@@ -53,6 +91,18 @@ public final class AppSettings {
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") == nil ? true : defaults.bool(forKey: "notificationsEnabled")
         let savedBaseline = defaults.integer(forKey: "dailyBaseline")
         self.dailyBaseline = savedBaseline > 0 ? savedBaseline : 20
+
+        // Review prompt tracking
+        let firstLaunchInterval = defaults.double(forKey: "firstLaunchDate")
+        self.firstLaunchDate = firstLaunchInterval > 0 ? Date(timeIntervalSince1970: firstLaunchInterval) : nil
+        self.totalCigarettesLogged = defaults.integer(forKey: "totalCigarettesLogged")
+        let lastPromptInterval = defaults.double(forKey: "lastReviewPromptDate")
+        self.lastReviewPromptDate = lastPromptInterval > 0 ? Date(timeIntervalSince1970: lastPromptInterval) : nil
+
+        // Set first launch date if not set
+        if self.firstLaunchDate == nil {
+            self.firstLaunchDate = .now
+        }
     }
 
     public func localized(_ key: L10n) -> String {

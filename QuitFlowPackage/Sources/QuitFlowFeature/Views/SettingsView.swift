@@ -131,7 +131,9 @@ struct SettingsView: View {
                 Spacer()
 
                 TextField("20", value: $settings.dailyBaseline, format: .number)
+                    #if os(iOS)
                     .keyboardType(.numberPad)
+                    #endif
                     .multilineTextAlignment(.trailing)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(Color.theme.textPrimary)
@@ -149,7 +151,9 @@ struct SettingsView: View {
 
                 HStack(spacing: 4) {
                     TextField("0", value: $settings.cigarettePrice, format: .number)
+                        #if os(iOS)
                         .keyboardType(.decimalPad)
+                        #endif
                         .multilineTextAlignment(.trailing)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color.theme.textPrimary)
@@ -171,7 +175,9 @@ struct SettingsView: View {
                 Spacer()
 
                 TextField("20", value: $settings.packSize, format: .number)
+                    #if os(iOS)
                     .keyboardType(.numberPad)
+                    #endif
                     .multilineTextAlignment(.trailing)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(Color.theme.textPrimary)
