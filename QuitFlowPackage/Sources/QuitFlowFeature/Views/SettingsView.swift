@@ -149,20 +149,14 @@ struct SettingsView: View {
 
                 Spacer()
 
-                HStack(spacing: 4) {
-                    TextField("0", value: $settings.cigarettePrice, format: .number)
-                        #if os(iOS)
-                        .keyboardType(.decimalPad)
-                        #endif
-                        .multilineTextAlignment(.trailing)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Color.theme.textPrimary)
-                        .frame(width: 70)
-
-                    Text(self.settings.localized(.settingsCurrency))
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(Color.theme.textTertiary)
-                }
+                TextField("0", value: $settings.cigarettePrice, format: .number)
+                    #if os(iOS)
+                    .keyboardType(.decimalPad)
+                    #endif
+                    .multilineTextAlignment(.trailing)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color.theme.textPrimary)
+                    .frame(width: 70)
             }
 
             Divider().overlay(Color.theme.glassBorder)

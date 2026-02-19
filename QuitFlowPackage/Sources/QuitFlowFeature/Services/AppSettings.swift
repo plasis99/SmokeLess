@@ -60,6 +60,16 @@ public final class AppSettings {
         }
     }
 
+    // MARK: - Watch Sync Tracking
+
+    public var lastWatchSyncTimestamp: Date? {
+        didSet {
+            if let date = lastWatchSyncTimestamp {
+                defaults.set(date.timeIntervalSince1970, forKey: "lastWatchSyncTimestamp")
+            }
+        }
+    }
+
     public func incrementCigaretteCount() {
         totalCigarettesLogged += 1
     }
@@ -98,6 +108,10 @@ public final class AppSettings {
         self.totalCigarettesLogged = defaults.integer(forKey: "totalCigarettesLogged")
         let lastPromptInterval = defaults.double(forKey: "lastReviewPromptDate")
         self.lastReviewPromptDate = lastPromptInterval > 0 ? Date(timeIntervalSince1970: lastPromptInterval) : nil
+
+        // Watch sync tracking
+        let lastSyncInterval = defaults.double(forKey: "lastWatchSyncTimestamp")
+        self.lastWatchSyncTimestamp = lastSyncInterval > 0 ? Date(timeIntervalSince1970: lastSyncInterval) : nil
 
         // Set first launch date if not set
         if self.firstLaunchDate == nil {

@@ -197,20 +197,14 @@ struct OnboardingView: View {
 
             Spacer()
 
-            HStack(spacing: 4) {
-                TextField("0", value: value, format: .number)
-                    #if os(iOS)
-                    .keyboardType(.decimalPad)
-                    #endif
-                    .multilineTextAlignment(.trailing)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(Color.theme.cyan)
-                    .frame(width: 70)
-
-                Text(settings.localized(.settingsCurrency))
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(Color.theme.textTertiary)
-            }
+            TextField("0", value: value, format: .number)
+                #if os(iOS)
+                .keyboardType(.decimalPad)
+                #endif
+                .multilineTextAlignment(.trailing)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(Color.theme.cyan)
+                .frame(width: 70)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 14)
@@ -276,31 +270,4 @@ struct OnboardingView: View {
     }
 }
 
-// MARK: - Simplified Cigarette Icon for Onboarding
-
-private struct CigaretteIcon: View {
-    var body: some View {
-        HStack(spacing: 0) {
-            // Burning tip
-            RoundedRectangle(cornerRadius: 2)
-                .fill(
-                    LinearGradient(
-                        colors: [.orange, .red.opacity(0.8)],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .frame(width: 8, height: 10)
-
-            // White body
-            Rectangle()
-                .fill(Color.white.opacity(0.85))
-                .frame(width: 30, height: 10)
-
-            // Filter
-            RoundedRectangle(cornerRadius: 2)
-                .fill(Color(red: 0.76, green: 0.56, blue: 0.34))
-                .frame(width: 14, height: 10)
-        }
-    }
-}
+// CigaretteIcon is now in Components/CigaretteIcon.swift (public, reusable)

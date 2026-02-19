@@ -36,7 +36,7 @@ public final class MainViewModel {
 
     // MARK: - Private
     private var timer: Timer?
-    private var lastEntryDate: Date?
+    private(set) var lastEntryDate: Date?
     private var modelContext: ModelContext?
     private var dailyBaseline: Int = 0
 

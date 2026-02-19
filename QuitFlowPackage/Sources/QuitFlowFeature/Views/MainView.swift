@@ -12,6 +12,7 @@ public struct MainView: View {
     @Environment(\.requestReview) private var requestReview
     #endif
     @State private var viewModel = MainViewModel()
+    @Environment(\.scenePhase) private var scenePhase
     @State private var appeared = false
     @State private var showSettings = false
     @State private var showAchievements = false
@@ -174,6 +175,20 @@ public struct MainView: View {
         .onDisappear {
             viewModel.stopTimer()
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                viewModel.loadTodayStats()
+                viewModel.loadWeekData()
+                #if os(iOS)
+                LiveActivityManager.shared.startOrUpdate(
+                    todayCount: viewModel.todayCount,
+                    lastCigaretteDate: viewModel.lastEntryDate
+                )
+                #endif
+                // Push entries logged via widget/Siri that Watch hasn't seen
+                sendPendingEntriesToWatch()
+            }
+        }
         .sheet(isPresented: $showSettings) {
             SettingsView()
                 .environment(settings)
@@ -224,6 +239,39 @@ public struct MainView: View {
                 viewModel.loadWeekData()
             }
         }
+        WatchConnectivityService.shared.onSyncRequested = {
+            sendAllEntriesToWatch()
+        }
+    }
+
+    /// Send last 30 days of entries to Watch for initial/full sync
+    private func sendAllEntriesToWatch() {
+        let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: .now)!
+        let predicate = #Predicate<SmokingEntry> { entry in
+            entry.timestamp >= thirtyDaysAgo
+        }
+        let descriptor = FetchDescriptor(predicate: predicate, sortBy: [SortDescriptor(\.timestamp)])
+        guard let entries = try? modelContext.fetch(descriptor), !entries.isEmpty else { return }
+        let transfers = entries.map { SmokingEntryTransfer(from: $0) }
+        WatchConnectivityService.shared.sendAllEntries(transfers)
+    }
+
+    /// Send entries logged via widget/Siri since last Watch sync
+    private func sendPendingEntriesToWatch() {
+        guard let lastSync = settings.lastWatchSyncTimestamp else {
+            // Never synced — send all recent entries
+            sendAllEntriesToWatch()
+            settings.lastWatchSyncTimestamp = .now
+            return
+        }
+        let predicate = #Predicate<SmokingEntry> { entry in
+            entry.timestamp > lastSync
+        }
+        let descriptor = FetchDescriptor(predicate: predicate, sortBy: [SortDescriptor(\.timestamp)])
+        guard let entries = try? modelContext.fetch(descriptor), !entries.isEmpty else { return }
+        let transfers = entries.map { SmokingEntryTransfer(from: $0) }
+        WatchConnectivityService.shared.sendAllEntries(transfers)
+        settings.lastWatchSyncTimestamp = .now
     }
 
     // MARK: - Ambient Blobs

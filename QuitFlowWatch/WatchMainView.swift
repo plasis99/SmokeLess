@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import WidgetKit
 import QuitFlowFeature
 import WatchKit
 
@@ -8,24 +9,60 @@ struct WatchMainView: View {
     @State private var todayCount: Int = 0
     @State private var timeSinceLast: TimeInterval = 0
     @State private var lastEntryDate: Date?
-    @State private var timer: Timer?
+    @State private var smokeProgress: CGFloat = 0
+    @State private var lastSyncTimestamp: Date? = UserDefaults.standard.object(forKey: "lastWatchSyncTimestamp") as? Date
+    @State private var lastLoggedEntry: SmokingEntry?
+    @State private var showUndo = false
+    @State private var undoTask: Task<Void, Never>?
 
-    private let teal = Color(red: 0.306, green: 0.871, blue: 0.706)
-    private let bgDark = Color(red: 0.04, green: 0.055, blue: 0.09)
+    private let bronzeText = Color(red: 0.863, green: 0.686, blue: 0.216)
+    private let bronze = Color(red: 0.769, green: 0.604, blue: 0.235)
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             // Time since last
             Text(formattedTime)
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundStyle(teal)
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundStyle(bronzeText)
                 .monospacedDigit()
 
             Text("since last")
-                .font(.system(size: 10, weight: .medium))
+                .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(.white.opacity(0.5))
 
-            Spacer().frame(height: 4)
+            // Big circular LOG button
+            Button {
+                logCigarette()
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(bronze.opacity(0.1))
+                        .frame(width: 105, height: 105)
+
+                    Circle()
+                        .fill(Color(white: 0.03))
+                        .frame(width: 95, height: 95)
+
+                    // Bronze spiral dots
+                    SpiralDots(color: bronze, dotCount: 18, turns: 2,
+                               innerRadius: 7.5, outerRadius: 41, minSize: 2.5, maxSize: 5)
+                        .frame(width: 95, height: 95)
+
+                    CigaretteIcon(height: 14)
+
+                    // Smoke wisps from cigarette tip
+                    ForEach(0..<3, id: \.self) { i in
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: smokeDotSize(i), height: smokeDotSize(i))
+                            .blur(radius: 1)
+                            .offset(x: -25 + smokeXOff(i),
+                                    y: -3 - smokeProgress * smokeYRange(i))
+                            .opacity(0.25 * Double(1 - smokeProgress))
+                    }
+                }
+            }
+            .buttonStyle(.plain)
 
             // Today count
             HStack(spacing: 4) {
@@ -38,38 +75,33 @@ struct WatchMainView: View {
                     .foregroundStyle(.white)
             }
 
-            Spacer().frame(height: 4)
-
-            // LOG button
-            Button {
-                logCigarette()
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 14, weight: .bold))
-                    Text("LOG")
-                        .font(.system(size: 14, weight: .bold))
-                        .tracking(1)
+            // Undo button (visible for 5 seconds after log)
+            if showUndo {
+                Button {
+                    undoLastEntry()
+                } label: {
+                    Text("Undo")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(bronzeText)
                 }
-                .foregroundStyle(.black)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(teal, in: RoundedRectangle(cornerRadius: 12))
+                .buttonStyle(.plain)
+                .transition(.opacity)
             }
-            .buttonStyle(.plain)
         }
         .padding(.horizontal, 8)
-        .background(bgDark)
+        .background(Color.black)
         .task {
             loadTodayStats()
-            startTimer()
             setupSyncCallbacks()
-        }
-        .onDisappear {
-            timer?.invalidate()
-            timer = nil
+            await runTimer()
         }
     }
+
+    // MARK: - Smoke Helpers
+
+    private func smokeDotSize(_ i: Int) -> CGFloat { [3, 4, 3][i] }
+    private func smokeXOff(_ i: Int) -> CGFloat { [(-3) as CGFloat, 1, 5][i] }
+    private func smokeYRange(_ i: Int) -> CGFloat { [22, 34, 26][i] }
 
     // MARK: - Formatted Time
 
@@ -96,11 +128,57 @@ struct WatchMainView: View {
         timeSinceLast = 0
         loadTodayStats()
 
+        // Smoke animation
+        smokeProgress = 0
+        withAnimation(.easeOut(duration: 1.2)) {
+            smokeProgress = 1
+        }
+
         // Haptic on Watch
         WKInterfaceDevice.current().play(.click)
 
         // Sync to iPhone
         WatchConnectivityService.shared.sendNewEntry(SmokingEntryTransfer(from: entry))
+
+        // Update Watch complication
+        WidgetCenter.shared.reloadAllTimelines()
+
+        // Undo support — show button for 5 seconds
+        lastLoggedEntry = entry
+        undoTask?.cancel()
+        withAnimation(.easeInOut(duration: 0.3)) {
+            showUndo = true
+        }
+        undoTask = Task {
+            try? await Task.sleep(for: .seconds(5))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeInOut(duration: 0.3)) {
+                showUndo = false
+            }
+            lastLoggedEntry = nil
+        }
+    }
+
+    private func undoLastEntry() {
+        guard let entry = lastLoggedEntry else { return }
+        let entryId = entry.id
+        undoTask?.cancel()
+        modelContext.delete(entry)
+        try? modelContext.save()
+        lastLoggedEntry = nil
+        withAnimation(.easeInOut(duration: 0.3)) {
+            showUndo = false
+        }
+        loadTodayStats()
+
+        // Sync delete to iPhone
+        WatchConnectivityService.shared.sendDeleteEntry(entryId)
+
+        // Update Watch complication
+        WidgetCenter.shared.reloadAllTimelines()
+
+        // Success haptic
+        WKInterfaceDevice.current().play(.success)
     }
 
     // MARK: - Data Loading
@@ -128,9 +206,9 @@ struct WatchMainView: View {
 
     // MARK: - Timer
 
-    private func startTimer() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+    private func runTimer() async {
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(1))
             if let last = lastEntryDate {
                 timeSinceLast = Date.now.timeIntervalSince(last)
             }
@@ -140,12 +218,25 @@ struct WatchMainView: View {
     // MARK: - Sync
 
     private func setupSyncCallbacks() {
-        WatchConnectivityService.shared.onEntriesReceived = { transfers in
+        let service = WatchConnectivityService.shared
+        service.onEntriesReceived = { transfers in
             mergeEntries(transfers)
         }
-        WatchConnectivityService.shared.onEntryDeleted = { id in
+        service.onEntryDeleted = { id in
             deleteEntry(id: id)
         }
+        service.onReachabilityRestored = {
+            requestSyncIfNeeded()
+        }
+
+        // Request initial sync if never synced or stale (>15 min)
+        requestSyncIfNeeded()
+    }
+
+    private func requestSyncIfNeeded() {
+        let isStale = lastSyncTimestamp.map { Date.now.timeIntervalSince($0) > 900 } ?? true
+        guard isStale, WatchConnectivityService.shared.isReachable else { return }
+        WatchConnectivityService.shared.requestSync()
     }
 
     private func mergeEntries(_ transfers: [SmokingEntryTransfer]) {
@@ -167,6 +258,13 @@ struct WatchMainView: View {
         }
         try? modelContext.save()
         loadTodayStats()
+
+        // Update Watch complication
+        WidgetCenter.shared.reloadAllTimelines()
+
+        // Update sync timestamp
+        lastSyncTimestamp = .now
+        UserDefaults.standard.set(Date.now, forKey: "lastWatchSyncTimestamp")
     }
 
     private func deleteEntry(id: UUID) {

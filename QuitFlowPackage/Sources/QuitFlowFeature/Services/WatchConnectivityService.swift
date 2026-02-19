@@ -1,4 +1,5 @@
 import Foundation
+#if canImport(WatchConnectivity)
 import WatchConnectivity
 
 @MainActor
@@ -12,6 +13,10 @@ public final class WatchConnectivityService: NSObject, @unchecked Sendable {
     public var onEntriesReceived: (([SmokingEntryTransfer]) -> Void)?
     /// Called when a delete request arrives from the counterpart device
     public var onEntryDeleted: ((UUID) -> Void)?
+    /// Called when the counterpart requests a full sync (Watch → iPhone pull)
+    public var onSyncRequested: (() -> Void)?
+    /// Called when reachability is restored (device comes into range)
+    public var onReachabilityRestored: (() -> Void)?
 
     private override init() {
         super.init()
@@ -56,6 +61,20 @@ public final class WatchConnectivityService: NSObject, @unchecked Sendable {
         }
     }
 
+    /// Request a full sync from the counterpart (Watch asks iPhone for all data)
+    public func requestSync() {
+        let session = WCSession.default
+        guard session.activationState == .activated else { return }
+
+        let data: [String: Any] = ["type": "syncRequest"]
+
+        if session.isReachable {
+            session.sendMessage(data, replyHandler: nil)
+        } else {
+            session.transferUserInfo(data)
+        }
+    }
+
     /// Send all local entries to counterpart for initial sync
     public func sendAllEntries(_ entries: [SmokingEntryTransfer]) {
         let session = WCSession.default
@@ -81,6 +100,7 @@ public final class WatchConnectivityService: NSObject, @unchecked Sendable {
         case newEntry(SmokingEntryTransfer)
         case deleteEntry(UUID)
         case fullSync([SmokingEntryTransfer])
+        case syncRequest
     }
 
     /// Parse data on the calling (nonisolated) thread, then dispatch Sendable result to MainActor
@@ -109,6 +129,8 @@ public final class WatchConnectivityService: NSObject, @unchecked Sendable {
             } else {
                 message = nil
             }
+        case "syncRequest":
+            message = .syncRequest
         default:
             message = nil
         }
@@ -122,6 +144,8 @@ public final class WatchConnectivityService: NSObject, @unchecked Sendable {
                 self.onEntryDeleted?(id)
             case .fullSync(let transfers):
                 self.onEntriesReceived?(transfers)
+            case .syncRequest:
+                self.onSyncRequested?()
             }
         }
     }
@@ -153,6 +177,9 @@ extension WatchConnectivityService: WCSessionDelegate {
         let reachable = session.isReachable
         Task { @MainActor in
             self.isReachable = reachable
+            if reachable {
+                self.onReachabilityRestored?()
+            }
         }
     }
 
@@ -163,3 +190,28 @@ extension WatchConnectivityService: WCSessionDelegate {
     }
     #endif
 }
+
+#else
+
+// Stub for platforms without WatchConnectivity (macOS)
+@MainActor
+@Observable
+public final class WatchConnectivityService: NSObject, @unchecked Sendable {
+    public static let shared = WatchConnectivityService()
+
+    public var isReachable = false
+    public var onEntriesReceived: (([SmokingEntryTransfer]) -> Void)?
+    public var onEntryDeleted: ((UUID) -> Void)?
+    public var onSyncRequested: (() -> Void)?
+    public var onReachabilityRestored: (() -> Void)?
+
+    private override init() { super.init() }
+
+    public func activate() {}
+    public func sendNewEntry(_ transfer: SmokingEntryTransfer) {}
+    public func sendDeleteEntry(_ id: UUID) {}
+    public func requestSync() {}
+    public func sendAllEntries(_ entries: [SmokingEntryTransfer]) {}
+}
+
+#endif

@@ -14,7 +14,7 @@ private let appGroupID = "group.com.perelygin.quitflow"
 struct SmokeLessEntry: TimelineEntry {
     let date: Date
     let todayCount: Int
-    let timeSinceLast: String
+    let lastCigaretteDate: Date?
     let hasData: Bool
 }
 
@@ -22,7 +22,7 @@ struct SmokeLessEntry: TimelineEntry {
 
 struct SmokeLessTimelineProvider: TimelineProvider {
     func placeholder(in context: Context) -> SmokeLessEntry {
-        SmokeLessEntry(date: .now, todayCount: 3, timeSinceLast: "1h 24m", hasData: true)
+        SmokeLessEntry(date: .now, todayCount: 3, lastCigaretteDate: .now.addingTimeInterval(-5040), hasData: true)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SmokeLessEntry) -> Void) {
@@ -42,7 +42,7 @@ struct SmokeLessTimelineProvider: TimelineProvider {
         guard let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupID
         ) else {
-            return SmokeLessEntry(date: .now, todayCount: 0, timeSinceLast: "—", hasData: false)
+            return SmokeLessEntry(date: .now, todayCount: 0, lastCigaretteDate: nil, hasData: false)
         }
 
         let storeURL = containerURL.appendingPathComponent("default.store")
@@ -61,29 +61,14 @@ struct SmokeLessTimelineProvider: TimelineProvider {
             let descriptor = FetchDescriptor(predicate: predicate, sortBy: [SortDescriptor(\.timestamp)])
             let entries = try context.fetch(descriptor)
 
-            let lastDate = entries.last?.timestamp
-            let timeSince: String
-            if let last = lastDate {
-                let interval = Date.now.timeIntervalSince(last)
-                let hours = Int(interval) / 3600
-                let minutes = (Int(interval) % 3600) / 60
-                if hours > 0 {
-                    timeSince = "\(hours)h \(minutes)m"
-                } else {
-                    timeSince = "\(minutes)m"
-                }
-            } else {
-                timeSince = "—"
-            }
-
             return SmokeLessEntry(
                 date: .now,
                 todayCount: entries.count,
-                timeSinceLast: timeSince,
+                lastCigaretteDate: entries.last?.timestamp,
                 hasData: true
             )
         } catch {
-            return SmokeLessEntry(date: .now, todayCount: 0, timeSinceLast: "—", hasData: false)
+            return SmokeLessEntry(date: .now, todayCount: 0, lastCigaretteDate: nil, hasData: false)
         }
     }
 }
@@ -123,10 +108,17 @@ struct SmokeLessWidgetView: View {
 
             Spacer()
 
-            Text(entry.timeSinceLast)
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(teal)
-                .minimumScaleFactor(0.6)
+            // Live timer with seconds
+            if let lastDate = entry.lastCigaretteDate {
+                Text(lastDate, style: .timer)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(teal)
+                    .monospacedDigit()
+            } else {
+                Text("—")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(teal)
+            }
 
             Text("since last")
                 .font(.system(size: 10, weight: .medium))
@@ -134,23 +126,23 @@ struct SmokeLessWidgetView: View {
 
             Spacer()
 
-            HStack {
-                HStack(spacing: 4) {
-                    Text("TODAY")
-                        .font(.system(size: 9, weight: .medium))
-                        .tracking(1)
-                        .foregroundStyle(.white.opacity(0.4))
-                    Text("\(entry.todayCount)")
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                }
-                Spacer()
-                Button(intent: LogCigaretteIntent()) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 26))
-                        .foregroundStyle(teal)
-                }
-                .buttonStyle(.plain)
+            // Cigarette button
+            Button(intent: LogCigaretteIntent()) {
+                CigaretteIcon(height: 8)
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+
+            // Today count
+            HStack(spacing: 4) {
+                Text("TODAY")
+                    .font(.system(size: 9, weight: .medium))
+                    .tracking(1)
+                    .foregroundStyle(.white.opacity(0.4))
+                Text("\(entry.todayCount)")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
             }
         }
         .padding(14)
@@ -163,10 +155,16 @@ struct SmokeLessWidgetView: View {
         HStack(spacing: 16) {
             // Left: Timer
             VStack(spacing: 6) {
-                Text(entry.timeSinceLast)
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundStyle(teal)
-                    .minimumScaleFactor(0.6)
+                if let lastDate = entry.lastCigaretteDate {
+                    Text(lastDate, style: .timer)
+                        .font(.system(size: 36, weight: .bold, design: .rounded))
+                        .foregroundStyle(teal)
+                        .monospacedDigit()
+                } else {
+                    Text("—")
+                        .font(.system(size: 36, weight: .bold, design: .rounded))
+                        .foregroundStyle(teal)
+                }
 
                 Text("since last cigarette")
                     .font(.system(size: 11, weight: .medium))
@@ -179,7 +177,7 @@ struct SmokeLessWidgetView: View {
                 .fill(teal.opacity(0.3))
                 .frame(width: 2, height: 50)
 
-            // Right: Today count + button
+            // Right: Today count + cigarette button
             VStack(spacing: 8) {
                 Text("\(entry.todayCount)")
                     .font(.system(size: 36, weight: .bold, design: .rounded))
@@ -190,17 +188,12 @@ struct SmokeLessWidgetView: View {
                     .foregroundStyle(.white.opacity(0.5))
 
                 Button(intent: LogCigaretteIntent()) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 12, weight: .bold))
-                        Text("LOG")
-                            .font(.system(size: 11, weight: .bold))
-                            .tracking(0.5)
+                    ZStack {
+                        Circle()
+                            .fill(teal.opacity(0.15))
+                            .frame(width: 40, height: 40)
+                        CigaretteIcon(height: 8)
                     }
-                    .foregroundStyle(bgDark)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 5)
-                    .background(teal, in: Capsule())
                 }
                 .buttonStyle(.plain)
             }
@@ -241,11 +234,11 @@ struct SmokeLessWidgetBundle: WidgetBundle {
 #Preview("Small", as: .systemSmall) {
     SmokeLessWidget()
 } timeline: {
-    SmokeLessEntry(date: .now, todayCount: 5, timeSinceLast: "1h 24m", hasData: true)
+    SmokeLessEntry(date: .now, todayCount: 5, lastCigaretteDate: .now.addingTimeInterval(-5040), hasData: true)
 }
 
 #Preview("Medium", as: .systemMedium) {
     SmokeLessWidget()
 } timeline: {
-    SmokeLessEntry(date: .now, todayCount: 5, timeSinceLast: "1h 24m", hasData: true)
+    SmokeLessEntry(date: .now, todayCount: 5, lastCigaretteDate: .now.addingTimeInterval(-5040), hasData: true)
 }

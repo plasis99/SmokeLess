@@ -1,4 +1,7 @@
 import AppIntents
+#if os(iOS)
+import ActivityKit
+#endif
 import SwiftData
 import WidgetKit
 
@@ -37,6 +40,17 @@ public struct LogCigaretteIntent: AppIntent {
         let todayCount = (try? context.fetch(descriptor).count) ?? 0
 
         WidgetCenter.shared.reloadAllTimelines()
+
+        // Update Live Activity directly (runs in widget extension process)
+        #if os(iOS)
+        let newState = CigaretteActivityAttributes.ContentState(
+            todayCount: todayCount,
+            lastCigaretteDate: .now
+        )
+        for activity in Activity<CigaretteActivityAttributes>.activities {
+            await activity.update(ActivityContent(state: newState, staleDate: nil))
+        }
+        #endif
 
         return .result(dialog: "Logged. Today: \(todayCount)")
     }

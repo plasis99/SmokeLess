@@ -10,6 +10,8 @@ public enum L10n: String, CaseIterable, Sendable {
     // Stats
     case today
     case vsYesterday
+    case lessYesterday
+    case moreYesterday
     case avgInterval
 
     // Goal
@@ -72,7 +74,7 @@ public enum L10n: String, CaseIterable, Sendable {
     case settingsPrice
     case settingsPackSize
     case settingsNotifications
-    case settingsCurrency
+
     case settingsAbout
     case settingsVersion
     case settingsResetData

@@ -26,7 +26,7 @@ public struct StatsRowView: View {
             .accessibilityLabel(settings.localized(.accessTodayCount, args: "\(todayCount)"))
 
             statCard(
-                title: settings.localized(.vsYesterday),
+                title: comparisonTitle,
                 value: differenceText,
                 valueColor: difference <= 0 ? Color.theme.cyan : Color.theme.amber
             )
@@ -41,10 +41,19 @@ public struct StatsRowView: View {
         }
     }
 
+    private var comparisonTitle: String {
+        if yesterdayCount == 0 || difference == 0 {
+            return settings.localized(.vsYesterday)
+        }
+        return difference < 0
+            ? settings.localized(.lessYesterday)
+            : settings.localized(.moreYesterday)
+    }
+
     private var differenceText: String {
         if yesterdayCount == 0 { return "—" }
-        if difference < 0 { return "↓ \(abs(difference))" }
-        if difference > 0 { return "↑ \(difference)" }
+        if difference < 0 { return "< \(abs(difference))" }
+        if difference > 0 { return "> \(difference)" }
         return "= 0"
     }
 

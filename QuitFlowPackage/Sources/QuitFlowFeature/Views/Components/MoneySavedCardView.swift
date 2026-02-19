@@ -57,8 +57,7 @@ public struct MoneySavedCardView: View {
     }
 
     private var formattedMoney: String {
-        let currency = settings.localized(.settingsCurrency)
-        return String(format: "%@%.0f", currency, moneySaved)
+        String(format: "%.0f", moneySaved)
     }
 
     private var cigaretteSymbol: String {
