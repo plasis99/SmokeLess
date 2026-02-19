@@ -1,6 +1,6 @@
 import AppIntents
 #if os(iOS)
-import ActivityKit
+@preconcurrency import ActivityKit
 #endif
 import SwiftData
 import WidgetKit

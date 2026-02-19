@@ -1,5 +1,5 @@
 #if os(iOS)
-import ActivityKit
+@preconcurrency import ActivityKit
 import Foundation
 
 @MainActor
@@ -10,7 +10,7 @@ public final class LiveActivityManager {
 
     private init() {}
 
-    public func startOrUpdate(todayCount: Int, lastCigaretteDate: Date?) {
+    public func startOrUpdate(todayCount: Int, lastCigaretteDate: Date?) async {
         let state = CigaretteActivityAttributes.ContentState(
             todayCount: todayCount,
             lastCigaretteDate: lastCigaretteDate ?? .now
@@ -24,34 +24,28 @@ public final class LiveActivityManager {
         // End all duplicate activities (keep only currentActivity)
         let allActivities = Activity<CigaretteActivityAttributes>.activities
         for activity in allActivities where activity.id != currentActivity?.id {
-            Task {
-                await activity.end(
-                    ActivityContent(state: state, staleDate: nil),
-                    dismissalPolicy: .immediate
-                )
-            }
+            await activity.end(
+                ActivityContent(state: state, staleDate: nil),
+                dismissalPolicy: .immediate
+            )
         }
 
         if let activity = currentActivity, activity.activityState == .active {
-            Task {
-                await activity.update(ActivityContent(state: state, staleDate: nil))
-            }
+            await activity.update(ActivityContent(state: state, staleDate: nil))
         } else {
             startActivity(state: state)
         }
     }
 
-    public func endActivity() {
+    public func endActivity() async {
         // End all activities (including orphans from previous process)
         let allActivities = Activity<CigaretteActivityAttributes>.activities
         for activity in allActivities {
             let finalState = activity.content.state
-            Task {
-                await activity.end(
-                    ActivityContent(state: finalState, staleDate: nil),
-                    dismissalPolicy: .immediate
-                )
-            }
+            await activity.end(
+                ActivityContent(state: finalState, staleDate: nil),
+                dismissalPolicy: .immediate
+            )
         }
         currentActivity = nil
     }

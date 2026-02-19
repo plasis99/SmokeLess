@@ -180,10 +180,9 @@ public struct MainView: View {
                 viewModel.loadTodayStats()
                 viewModel.loadWeekData()
                 #if os(iOS)
-                LiveActivityManager.shared.startOrUpdate(
-                    todayCount: viewModel.todayCount,
-                    lastCigaretteDate: viewModel.lastEntryDate
-                )
+                let count = viewModel.todayCount
+                let date = viewModel.lastEntryDate
+                Task { await LiveActivityManager.shared.startOrUpdate(todayCount: count, lastCigaretteDate: date) }
                 #endif
                 // Push entries logged via widget/Siri that Watch hasn't seen
                 sendPendingEntriesToWatch()

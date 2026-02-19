@@ -57,7 +57,9 @@ public final class MainViewModel {
         // Start Live Activity if there's data today
         #if os(iOS)
         if todayCount > 0 {
-            LiveActivityManager.shared.startOrUpdate(todayCount: todayCount, lastCigaretteDate: lastEntryDate)
+            let count = todayCount
+            let date = lastEntryDate
+            Task { await LiveActivityManager.shared.startOrUpdate(todayCount: count, lastCigaretteDate: date) }
         }
         #endif
     }
@@ -86,7 +88,9 @@ public final class MainViewModel {
 
         // Update Live Activity
         #if os(iOS)
-        LiveActivityManager.shared.startOrUpdate(todayCount: todayCount, lastCigaretteDate: entry.timestamp)
+        let count = todayCount
+        let ts = entry.timestamp
+        Task { await LiveActivityManager.shared.startOrUpdate(todayCount: count, lastCigaretteDate: ts) }
         #endif
 
         // Sync to Watch / iPhone
@@ -135,9 +139,11 @@ public final class MainViewModel {
         // Update Live Activity
         #if os(iOS)
         if todayCount > 0 {
-            LiveActivityManager.shared.startOrUpdate(todayCount: todayCount, lastCigaretteDate: lastEntryDate)
+            let count = todayCount
+            let date = lastEntryDate
+            Task { await LiveActivityManager.shared.startOrUpdate(todayCount: count, lastCigaretteDate: date) }
         } else {
-            LiveActivityManager.shared.endActivity()
+            Task { await LiveActivityManager.shared.endActivity() }
         }
         #endif
     }
