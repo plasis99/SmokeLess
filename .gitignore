@@ -60,3 +60,11 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# Build artifacts
+build/
+ExportOptions.plist
+*.xcarchive
+
+# macOS
+.DS_Store

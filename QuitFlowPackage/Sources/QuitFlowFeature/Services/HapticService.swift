@@ -1,6 +1,7 @@
 #if os(iOS)
 import UIKit
 
+@MainActor
 public enum HapticService {
     public static func impact(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
         let generator = UIImpactFeedbackGenerator(style: style)
