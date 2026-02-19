@@ -13,6 +13,8 @@
 		AA000F002DF0000000000001 /* QuitFlowWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA0001002DF0000000000001 /* QuitFlowWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BB0007002DF0000000000001 /* QuitFlowFeature in Frameworks */ = {isa = PBXBuildFile; productRef = BB000E002DF0000000000001 /* QuitFlowFeature */; };
 		BB000F002DF0000000000001 /* QuitFlowWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = BB0001002DF0000000000001 /* QuitFlowWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CC0007002DF0000000000001 /* QuitFlowFeature in Frameworks */ = {isa = PBXBuildFile; productRef = CC000E002DF0000000000001 /* QuitFlowFeature */; };
+		CC000F002DF0000000000001 /* QuitFlowWatchWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CC0001002DF0000000000001 /* QuitFlowWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +38,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = BB0006002DF0000000000001;
 			remoteInfo = QuitFlowWatch;
+		};
+		CC0008002DF0000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B41F63D2DEDD0D5001A66F9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC0006002DF0000000000001;
+			remoteInfo = QuitFlowWatchWidget;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -62,6 +71,17 @@
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC000A002DF0000000000001 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				CC000F002DF0000000000001 /* QuitFlowWatchWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +89,7 @@
 		8B41F65C2DEDD0D6001A66F9 /* QuitFlow.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuitFlow.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA0001002DF0000000000001 /* QuitFlowWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = QuitFlowWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0001002DF0000000000001 /* QuitFlowWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuitFlowWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC0001002DF0000000000001 /* QuitFlowWatchWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = QuitFlowWatchWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -123,6 +144,11 @@
 			path = QuitFlowWatch;
 			sourceTree = "<group>";
 		};
+		CC0002002DF0000000000001 /* QuitFlowWatchWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = QuitFlowWatchWidget;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +184,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC0004002DF0000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC0007002DF0000000000001 /* QuitFlowFeature in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -168,6 +202,7 @@
 				8B41F6472DEDD0D5001A66F9 /* QuitFlow */,
 				AA0002002DF0000000000001 /* QuitFlowWidget */,
 				BB0002002DF0000000000001 /* QuitFlowWatch */,
+				CC0002002DF0000000000001 /* QuitFlowWatchWidget */,
 				8B41F65F2DEDD0D6001A66F9 /* QuitFlowUITests */,
 				8B41F6812DEDD23B001A66F9 /* Frameworks */,
 				8B41F6462DEDD0D5001A66F9 /* Products */,
@@ -181,6 +216,7 @@
 				8B41F65C2DEDD0D6001A66F9 /* QuitFlow.xctest */,
 				AA0001002DF0000000000001 /* QuitFlowWidgetExtension.appex */,
 				BB0001002DF0000000000001 /* QuitFlowWatch.app */,
+				CC0001002DF0000000000001 /* QuitFlowWatchWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -277,10 +313,12 @@
 				BB0003002DF0000000000001 /* Sources */,
 				BB0004002DF0000000000001 /* Frameworks */,
 				BB0005002DF0000000000001 /* Resources */,
+				CC000A002DF0000000000001 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				CC0009002DF0000000000001 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				BB0002002DF0000000000001 /* QuitFlowWatch */,
@@ -292,6 +330,29 @@
 			productName = QuitFlowWatch;
 			productReference = BB0001002DF0000000000001 /* QuitFlowWatch.app */;
 			productType = "com.apple.product-type.application";
+		};
+		CC0006002DF0000000000001 /* QuitFlowWatchWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC000D002DF0000000000001 /* Build configuration list for PBXNativeTarget "QuitFlowWatchWidget" */;
+			buildPhases = (
+				CC0003002DF0000000000001 /* Sources */,
+				CC0004002DF0000000000001 /* Frameworks */,
+				CC0005002DF0000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CC0002002DF0000000000001 /* QuitFlowWatchWidget */,
+			);
+			name = QuitFlowWatchWidget;
+			packageProductDependencies = (
+				CC000E002DF0000000000001 /* QuitFlowFeature */,
+			);
+			productName = QuitFlowWatchWidget;
+			productReference = CC0001002DF0000000000001 /* QuitFlowWatchWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -316,6 +377,9 @@
 					BB0006002DF0000000000001 = {
 						CreatedOnToolsVersion = 16.3;
 					};
+					CC0006002DF0000000000001 = {
+						CreatedOnToolsVersion = 16.3;
+					};
 				};
 			};
 			buildConfigurationList = 8B41F6402DEDD0D5001A66F9 /* Build configuration list for PBXProject "QuitFlow" */;
@@ -336,6 +400,7 @@
 				8B41F65B2DEDD0D6001A66F9 /* QuitFlowUITests */,
 				AA0006002DF0000000000001 /* QuitFlowWidgetExtension */,
 				BB0006002DF0000000000001 /* QuitFlowWatch */,
+				CC0006002DF0000000000001 /* QuitFlowWatchWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -363,6 +428,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BB0005002DF0000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC0005002DF0000000000001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -400,6 +472,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC0003002DF0000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -417,6 +496,11 @@
 			isa = PBXTargetDependency;
 			target = BB0006002DF0000000000001 /* QuitFlowWatch */;
 			targetProxy = BB0008002DF0000000000001 /* PBXContainerItemProxy */;
+		};
+		CC0009002DF0000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC0006002DF0000000000001 /* QuitFlowWatchWidget */;
+			targetProxy = CC0008002DF0000000000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -724,6 +808,52 @@
 			};
 			name = Release;
 		};
+		CC000B002DF0000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = QuitFlowWatchWidget/QuitFlowWatchWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = S27D4DAHJT;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SmokeLess;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.perelygin.quitflow.watchkitapp.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		CC000C002DF0000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = QuitFlowWatchWidget/QuitFlowWatchWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = S27D4DAHJT;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SmokeLess;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.perelygin.quitflow.watchkitapp.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -772,6 +902,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		CC000D002DF0000000000001 /* Build configuration list for PBXNativeTarget "QuitFlowWatchWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC000B002DF0000000000001 /* Debug */,
+				CC000C002DF0000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -788,6 +927,10 @@
 			productName = QuitFlowFeature;
 		};
 		BB000E002DF0000000000001 /* QuitFlowFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = QuitFlowFeature;
+		};
+		CC000E002DF0000000000001 /* QuitFlowFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = QuitFlowFeature;
 		};
