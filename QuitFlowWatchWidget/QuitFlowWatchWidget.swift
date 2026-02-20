@@ -101,9 +101,7 @@ struct WatchComplicationRectangularView: View {
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.6))
                 HStack(spacing: 4) {
-                    Image(systemName: "flame")
-                        .font(.system(size: 12))
-                        .foregroundStyle(bronze)
+                    CigaretteIcon(height: 8, showSmoke: true)
                     Text("\(entry.todayCount) today")
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)

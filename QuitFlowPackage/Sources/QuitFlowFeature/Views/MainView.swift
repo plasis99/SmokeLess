@@ -177,6 +177,8 @@ public struct MainView: View {
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
+                // Process any entries logged via Lock Screen fallback
+                viewModel.processPendingLogs()
                 viewModel.loadTodayStats()
                 viewModel.loadWeekData()
                 #if os(iOS)

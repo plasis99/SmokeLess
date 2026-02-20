@@ -2,8 +2,11 @@
 import ActivityKit
 #endif
 import Foundation
+import OSLog
 import SwiftData
 import SwiftUI
+
+private let intentLogger = Logger(subsystem: "com.perelygin.quitflow", category: "PendingLogs")
 
 @MainActor
 @Observable
@@ -146,6 +149,36 @@ public final class MainViewModel {
             Task { await LiveActivityManager.shared.endActivity() }
         }
         #endif
+    }
+
+    /// Process entries logged via Lock Screen fallback (UserDefaults) when SwiftData was unavailable
+    public func processPendingLogs() {
+        guard let modelContext else { return }
+        let appGroupID = "group.com.perelygin.quitflow"
+        guard let defaults = UserDefaults(suiteName: appGroupID) else { return }
+
+        let pendingCount = defaults.integer(forKey: "pendingLogCount")
+        guard pendingCount > 0 else { return }
+
+        let lastTimestamp = defaults.double(forKey: "lastPendingLogTimestamp")
+        intentLogger.info("Processing \(pendingCount) pending logs from Lock Screen fallback")
+
+        // Create entries for each pending log (spread timestamps 1 second apart)
+        for i in 0..<pendingCount {
+            let ts = Date(timeIntervalSince1970: lastTimestamp - Double(pendingCount - 1 - i))
+            let entry = SmokingEntry(timestamp: ts)
+            modelContext.insert(entry)
+        }
+        try? modelContext.save()
+
+        // Clear pending
+        defaults.removeObject(forKey: "pendingLogCount")
+        defaults.removeObject(forKey: "lastPendingLogTimestamp")
+
+        loadTodayStats()
+        loadWeekData()
+        loadMoneySavedData()
+        loadStreakData()
     }
 
     // MARK: - Timer

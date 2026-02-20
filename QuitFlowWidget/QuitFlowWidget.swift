@@ -98,13 +98,10 @@ struct SmokeLessWidgetView: View {
 
     private var smallWidget: some View {
         VStack(spacing: 6) {
-            HStack {
-                Text("SMOKELESS")
-                    .font(.system(size: 9, weight: .semibold))
-                    .tracking(1.5)
-                    .foregroundStyle(.white.opacity(0.5))
-                Spacer()
-            }
+            Text("SMOKELESS")
+                .font(.system(size: 9, weight: .semibold))
+                .tracking(1.5)
+                .foregroundStyle(.white.opacity(0.5))
 
             Spacer()
 
@@ -128,7 +125,7 @@ struct SmokeLessWidgetView: View {
 
             // Cigarette button
             Button(intent: LogCigaretteIntent()) {
-                CigaretteIcon(height: 8)
+                CigaretteIcon(height: 12, showSmoke: true)
             }
             .buttonStyle(.plain)
 
@@ -192,7 +189,7 @@ struct SmokeLessWidgetView: View {
                         Circle()
                             .fill(teal.opacity(0.15))
                             .frame(width: 40, height: 40)
-                        CigaretteIcon(height: 8)
+                        CigaretteIcon(height: 10, showSmoke: true)
                     }
                 }
                 .buttonStyle(.plain)

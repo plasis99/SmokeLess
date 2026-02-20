@@ -4,9 +4,11 @@ import SwiftUI
 /// Reused on onboarding, Watch LOG button, and widget.
 public struct CigaretteIcon: View {
     let height: CGFloat
+    let showSmoke: Bool
 
-    public init(height: CGFloat = 10) {
+    public init(height: CGFloat = 10, showSmoke: Bool = false) {
         self.height = height
+        self.showSmoke = showSmoke
     }
 
     public var body: some View {
@@ -84,6 +86,34 @@ public struct CigaretteIcon: View {
             }
             .clipShape(Capsule())
             .shadow(color: .black.opacity(0.3), radius: height * 0.2, x: 0, y: height * 0.15)
+
+            // Static smoke wisps above the burning tip (WidgetKit-safe)
+            if showSmoke {
+                // Total cigarette width = 0.8 + 3.0 + 1.4 = 5.2 * height
+                // Tip center X offset from ZStack center = -(5.2/2 - 0.8/2) * height = -2.2 * height
+                let tipOffsetX = -height * 2.2
+
+                // Wisp 1 — small, close to tip
+                Ellipse()
+                    .fill(Color.white.opacity(0.20))
+                    .frame(width: height * 0.5, height: height * 0.7)
+                    .blur(radius: height * 0.25)
+                    .offset(x: tipOffsetX, y: -height * 0.9)
+
+                // Wisp 2 — medium, drifting slightly
+                Ellipse()
+                    .fill(Color.white.opacity(0.14))
+                    .frame(width: height * 0.7, height: height * 1.0)
+                    .blur(radius: height * 0.35)
+                    .offset(x: tipOffsetX + height * 0.3, y: -height * 1.5)
+
+                // Wisp 3 — large, highest, most diffuse
+                Ellipse()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: height * 1.0, height: height * 1.3)
+                    .blur(radius: height * 0.5)
+                    .offset(x: tipOffsetX - height * 0.2, y: -height * 2.2)
+            }
         }
     }
 }
