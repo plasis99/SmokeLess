@@ -69,6 +69,9 @@ ExportOptions.plist
 # macOS
 .DS_Store
 
+# Claude Code local config
+.claude/
+
 # Firebase
 firebase-debug.log
 
