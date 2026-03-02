@@ -68,3 +68,13 @@ ExportOptions.plist
 
 # macOS
 .DS_Store
+
+# Firebase
+firebase-debug.log
+
+# Design tools
+*.pen
+
+# Build artifacts
+*.tsbuildinfo
+*.textClipping
