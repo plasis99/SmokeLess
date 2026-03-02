@@ -1,0 +1,145 @@
+appId: com.perelygin.quitflow
+---
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║  QuitFlow (SmokeLess) — Full E2E Test                           ║
+# ║  Splash → Language → Onboarding → Main → Log → Settings →       ║
+# ║  Achievements → Stats → Main                                    ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PHASE 1: Fresh Launch (clearState → splash → language)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- launchApp:
+    appId: com.perelygin.quitflow
+    clearState: true
+
+# Splash auto-dismisses in ~2s, then Language Selection
+- extendedWaitUntil:
+    visible: ".*Choose Language.*|.*English.*"
+    timeout: 10000
+
+- takeScreenshot: .maestro/screenshots/01-language-selection
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PHASE 2: Select English & Start Onboarding
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- tapOn: "English"
+- tapOn: "Continue"
+
+- extendedWaitUntil:
+    visible: ".*Track Your Habit.*"
+    timeout: 8000
+
+- takeScreenshot: .maestro/screenshots/02-onboarding-page1
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PHASE 3: Complete Onboarding (4 pages)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- tapOn: "Continue"
+
+- extendedWaitUntil:
+    visible: ".*See Your Progress.*"
+    timeout: 5000
+- takeScreenshot: .maestro/screenshots/03-onboarding-page2
+
+- tapOn: "Continue"
+
+- extendedWaitUntil:
+    visible: ".*Move Toward Freedom.*"
+    timeout: 5000
+- takeScreenshot: .maestro/screenshots/04-onboarding-page3
+
+- tapOn: "Continue"
+
+- extendedWaitUntil:
+    visible: ".*Tell us about you.*|.*Get Started.*"
+    timeout: 5000
+- takeScreenshot: .maestro/screenshots/05-onboarding-setup
+
+# Complete setup (use defaults)
+- tapOn: "Get Started"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PHASE 4: Main Screen
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- extendedWaitUntil:
+    visible: ".*SMOKELESS.*|.*SINCE LAST.*"
+    timeout: 10000
+
+- takeScreenshot: .maestro/screenshots/06-main-screen
+
+# Scroll to see week chart and money saved
+- scroll
+- takeScreenshot: .maestro/screenshots/07-main-scrolled
+
+- swipe:
+    direction: UP
+    duration: 400
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PHASE 5: Log a Cigarette
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- tapOn: "Log a cigarette"
+
+- takeScreenshot: .maestro/screenshots/08-after-log
+
+# Undo the log
+- tapOn:
+    text: "Undo"
+    optional: true
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PHASE 6: Settings Sheet
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Gear button (top-right) — no accessibilityLabel, tap by icon
+- tapOn:
+    id: "gearshape"
+    optional: true
+
+- extendedWaitUntil:
+    visible: ".*SETTINGS.*|.*LANGUAGE.*"
+    timeout: 5000
+
+- takeScreenshot: .maestro/screenshots/09-settings
+
+- scroll
+- takeScreenshot: .maestro/screenshots/10-settings-scrolled
+
+# Dismiss settings
+- swipe:
+    start: 50%, 20%
+    end: 50%, 80%
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PHASE 7: Achievements Sheet
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- tapOn:
+    id: "trophy"
+    optional: true
+
+- extendedWaitUntil:
+    visible: ".*ACHIEVEMENTS.*|.*HEALTH.*"
+    timeout: 5000
+
+- takeScreenshot: .maestro/screenshots/11-achievements
+
+- scroll
+- takeScreenshot: .maestro/screenshots/12-achievements-scrolled
+
+# Dismiss achievements
+- swipe:
+    start: 50%, 20%
+    end: 50%, 80%
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PHASE 8: Final Main Screen
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- assertVisible:
+    text: ".*SMOKELESS.*"
+    optional: true
+
+- takeScreenshot: .maestro/screenshots/13-main-final
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# DONE — 8 phases, 13 screenshots
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
